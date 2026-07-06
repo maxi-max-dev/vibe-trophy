@@ -46,6 +46,8 @@ const S = {
   maxSessionTokens: 0, saidRight: 0, taskCalls: 0, toolCalls: 0, mcpCalls: 0,
   askCalls: 0, gitCommits: 0, images: 0, interrupts: 0, compacts: 0,
   longPrompts: 0, maxPromptLen: 0, models: new Map(),
+  thanks: 0, swears: 0, tiny: 0, repeats: 0, urls: 0, waits: 0, maxWait: 0,
+  lunch: new Set(), dinner: new Set(),
   projects: new Set(), longestRun: 0, maxBurst: 0, daySpan: {}, hourSessions: {}, daySessions: {},
   limitHit: false, firstTs: Infinity, lastTs: 0,
 };
@@ -54,20 +56,25 @@ const RIGHT_RE = /you'?re absolutely right|你说得对|你是对的/i;
 for (const f of files) {
   let lines;
   try { lines = fs.readFileSync(f, 'utf8').split('\n'); } catch { continue; }
-  let sTokens = 0, evts = [], isSide = false, sawFirst = false, burst = 0;
+  let sTokens = 0, evts = [], isSide = false, sawFirst = false, burst = 0, prevTyped = '', fileLastTs = NaN;
   for (const line of lines) {
     if (!line.trim()) continue;
     let j; try { j = JSON.parse(line); } catch { continue; }
     if (!sawFirst && typeof j.isSidechain === 'boolean') { isSide = j.isSidechain; sawFirst = true; }
     if (j.type === 'summary' || j.isCompactSummary) S.compacts++;
     const ts = j.timestamp ? Date.parse(j.timestamp) : NaN;
+    let lineGap = NaN;
     if (!isNaN(ts)) {
+      if (!isNaN(fileLastTs)) lineGap = ts - fileLastTs;
+      fileLastTs = ts;
       evts.push(ts);
       S.firstTs = Math.min(S.firstTs, ts); S.lastTs = Math.max(S.lastTs, ts);
       const { date, hour } = local(ts);
       S.days.add(date);
       if (hour >= 2 && hour < 6) S.nightDays.add(date);
       if (hour === 5) S.dawnDays.add(date);
+      if (hour === 12 || hour === 13) S.lunch.add(date);
+      if (hour === 18 || hour === 19) S.dinner.add(date);
       if (!S.daySpan[date]) S.daySpan[date] = [ts, ts];
       S.daySpan[date][0] = Math.min(S.daySpan[date][0], ts);
       S.daySpan[date][1] = Math.max(S.daySpan[date][1], ts);
@@ -91,21 +98,34 @@ for (const f of files) {
       if (m.model && m.model !== '<synthetic>') S.models.set(m.model, (S.models.get(m.model) || 0) + 1);
       const c = m.content;
       if (j.type === 'user') {
-        let typedLen = 0, hasInterrupt = false;
-        if (typeof c === 'string') { typedLen = c.trim().length; hasInterrupt = c.includes('[Request interrupted'); }
+        let typedText = '', hasInterrupt = false;
+        if (typeof c === 'string') { typedText = c.trim(); hasInterrupt = c.includes('[Request interrupted'); }
         else if (Array.isArray(c)) {
+          const parts = [];
           for (const b of c) {
             if (b.type === 'text' && b.text) {
-              typedLen += b.text.trim().length;
+              parts.push(b.text.trim());
               if (b.text.includes('[Request interrupted')) hasInterrupt = true;
             } else if (b.type === 'image') S.images++;
           }
+          typedText = parts.join('\n').trim();
         }
+        const typedLen = typedText.length;
         if (hasInterrupt) S.interrupts++;
         if (typedLen > 0 && !hasInterrupt) {
           burst = 0; // 真人开口，连击重计
           if (typedLen > S.maxPromptLen) S.maxPromptLen = typedLen;
           if (typedLen >= 500) S.longPrompts++;
+          // 风格统计：跳过工具/系统注入的消息（<tag> 开头等）
+          if (!/^</.test(typedText) && !/<command-|<local-command|<system-reminder/.test(typedText)) {
+            if (/谢谢|辛苦了|thank/i.test(typedText)) S.thanks++;
+            if (/卧槽|我靠|妈的|他妈|tmd|艹|fuck|shit|wtf/i.test(typedText)) S.swears++;
+            if (typedLen <= 2) S.tiny++;
+            if (/https?:\/\//.test(typedText)) S.urls++;
+            if (typedText === prevTyped && typedLen >= 2) S.repeats++;
+            prevTyped = typedText;
+            if (lineGap >= 2 * 36e5) { S.waits++; if (lineGap > S.maxWait) S.maxWait = lineGap; }
+          }
         }
       } else if (j.type === 'assistant' && Array.isArray(c)) {
         for (const b of c) {
@@ -149,6 +169,8 @@ let maxDayS = 0;
 for (const k in S.daySessions) maxDayS = Math.max(maxDayS, S.daySessions[k].size);
 let maxDaySpanH = 0;
 for (const d in S.daySpan) maxDaySpanH = Math.max(maxDaySpanH, (S.daySpan[d][1] - S.daySpan[d][0]) / 36e5);
+const mealBoth = [...S.lunch].filter(d => S.dinner.has(d)).length;
+const wknd = [...S.days].filter(d => { const w = new Date(d + 'T00:00:00Z').getUTCDay(); return w === 0 || w === 6; }).length;
 
 const totalTokens = S.tokens.in + S.tokens.out + S.tokens.cc + S.tokens.cr;
 const yi = n => n >= 1e8 ? `${(n / 1e8).toFixed(1)} 亿` : n >= 1e4 ? `${(n / 1e4).toFixed(1)} 万` : `${n}`;
@@ -158,12 +180,16 @@ const h1 = h => `${Math.floor(h)} 小时 ${Math.round(h % 1 * 60)} 分`;
 // ---------- 成就定义 ----------
 // cur/max 数值型给进度条；bool 型只给 hint
 const A = [
-  // 🌱 入门
-  { g: '入门', icon: '👋', name: 'Hello World', tier: '铜', desc: '第一次打开 Claude Code，从此再没亲手写过代码', cur: S.sessions, max: 1, val: `入坑于 ${isFinite(S.firstTs) ? local(S.firstTs).date : '?'}` },
-  { g: '入门', icon: '🗺️', name: '项目海王', tier: '银', desc: '同时撩 10 个以上项目，每一个都说过"这是主线"', cur: S.projects.size, max: 10, val: `${S.projects.size} 个项目` },
-  { g: '入门', icon: '🧰', name: '装备党', tier: '银', desc: 'MCP 工具调用 500 次，工具比活儿多', cur: S.mcpCalls, max: 500, val: `${S.mcpCalls} 次 MCP 调用` },
-  { g: '入门', icon: '🖼️', name: '一图胜千言', tier: '铜', desc: '截图一甩："就照这个做"，累计 10 张', cur: S.images, max: 10, val: `甩过 ${S.images} 张图` },
-  { g: '入门', icon: '📚', name: '提示词小说家', tier: '银', desc: '单条消息 500 字起步，这不是 prompt 是需求文档', cur: S.longPrompts, max: 1, val: `最长一条 ${S.maxPromptLen} 字，超500字共 ${S.longPrompts} 条` },
+  // 🌱 日常
+  { g: '日常', icon: '👋', name: 'Hello World', tier: '铜', desc: '第一次打开 Claude Code，从此再没亲手写过代码', cur: S.sessions, max: 1, val: `入坑于 ${isFinite(S.firstTs) ? local(S.firstTs).date : '?'}` },
+  { g: '日常', icon: '🗺️', name: '项目海王', tier: '银', desc: '同时撩 10 个以上项目，每一个都说过"这是主线"', cur: S.projects.size, max: 10, val: `${S.projects.size} 个项目` },
+  { g: '日常', icon: '🧰', name: '装备党', tier: '银', desc: 'MCP 工具调用 500 次，工具比活儿多', cur: S.mcpCalls, max: 500, val: `${S.mcpCalls} 次 MCP 调用` },
+  { g: '日常', icon: '🖼️', name: '一图胜千言', tier: '铜', desc: '截图一甩："就照这个做"，累计 10 张', cur: S.images, max: 10, val: `甩过 ${S.images} 张图` },
+  { g: '日常', icon: '📚', name: '提示词小说家', tier: '银', desc: '单条消息 500 字起步，这不是 prompt 是需求文档', cur: S.longPrompts, max: 1, val: `最长一条 ${S.maxPromptLen} 字，超500字共 ${S.longPrompts} 条` },
+  { g: '日常', icon: '🤏', name: '一字千金', tier: '银', desc: '两个字以内的指令发了 20 条，"继续"就是最强 prompt', cur: S.tiny, max: 20, val: `${S.tiny} 条极简指令` },
+  { g: '日常', icon: '🔂', name: '复读机', tier: '铜', desc: '一字不差把同一句话再发一遍，共 5 次。再试一次，再试亿次', cur: S.repeats, max: 5, val: `${S.repeats} 次原句重发` },
+  { g: '日常', icon: '🧭', name: '导航员', tier: '铜', desc: '甩了 50 个链接过去："你自己去看"', cur: S.urls, max: 50, val: `${S.urls} 条带链接消息` },
+  { g: '日常', icon: '🪞', name: '元成就', tier: '铜', hidden: true, desc: '用一个成就系统，围观自己的成就', cur: 1, max: 1, val: '你正在看它' },
   // 🌙 肝度
   { g: '肝度', icon: '🌙', name: '凌晨三点俱乐部', tier: '银', desc: '02:00–06:00 还在 vibe，全世界只剩你和它的 loading', cur: S.nightDays.size, max: 1, val: `${S.nightDays.size} 个深夜` },
   { g: '肝度', icon: '🧛', name: '吸血鬼作息', tier: '金', desc: '连续 3 天深夜营业，太阳升起前必须收工', cur: vampStreak, max: 3, val: `连续 ${vampStreak} 天深夜在线` },
@@ -174,6 +200,8 @@ const A = [
   { g: '肝度', icon: '🗓️', name: '日理万机', tier: '金', desc: '单日开 15 场会话，每个窗口都在"快好了"', cur: maxDayS, max: 15, val: `单日最多 ${maxDayS} 场` },
   { g: '肝度', icon: '🎪', name: '多线程人格', tier: '金', desc: '同一小时 3 路会话并行：左手报错，右手"你说得对"', cur: maxPara, max: 3, val: `最高并行 ${maxPara} 路` },
   { g: '肝度', icon: '🔁', name: '我又回来了', tier: '铜', hidden: true, desc: '戒了 7 天，还是回来了', cur: comeback ? 1 : 0, max: 1, val: '欢迎回家' },
+  { g: '肝度', icon: '🍜', name: '饭点不存在', tier: '银', desc: '午饭点和晚饭点都在线，共 10 天。干饭不如干活', cur: mealBoth, max: 10, val: `${mealBoth} 天午晚连线` },
+  { g: '肝度', icon: '🌤️', name: '周末战士', tier: '铜', desc: '周六周日也在线 10 天，双休是不存在的', cur: wknd, max: 10, val: `周末上线 ${wknd} 天` },
   // 💸 钞能力
   { g: '钞能力', icon: '🔥', name: '烧 token 大户', tier: '金', desc: '单次会话烧掉 5000 万 token，电表都没你转得快', cur: S.maxSessionTokens, max: 5e7, val: `单会话纪录 ${yi(S.maxSessionTokens)}`, fmt: yi },
   { g: '钞能力', icon: '💯', name: '亿级玩家', tier: '白金', hidden: true, desc: '单会话破 1 亿 token。致敬传说中 1.2 亿的那位', cur: S.maxSessionTokens, max: 1e8, val: `单会话纪录 ${yi(S.maxSessionTokens)}`, fmt: yi },
@@ -188,13 +216,16 @@ const A = [
   { g: '微操', icon: '💥', name: '上下文爆破手', tier: '银', desc: '把对话聊到失忆 10 次，compact 是一种境界', cur: S.compacts, max: 10, val: `${S.compacts} 次失忆` },
   { g: '微操', icon: '🎰', name: '全家桶收集者', tier: '银', desc: '用过 3 种以上模型：Opus 干活，Haiku 跑腿，Sonnet 背锅', cur: S.models.size, max: 3, val: `${S.models.size} 种模型` },
   { g: '微操', icon: '🙋', name: '甲方本人', tier: '铜', desc: '被 AI 反过来追问 20 次需求，这就是话语权', cur: S.askCalls, max: 20, val: `被追问 ${S.askCalls} 次` },
+  { g: '微操', icon: '🙏', name: '人机礼仪模范', tier: '铜', desc: '对 AI 说了 20 次谢谢。它记不住，但你是好人', cur: S.thanks, max: 20, val: `${S.thanks} 次感谢` },
+  { g: '微操', icon: '🤬', name: '口吐芬芳', tier: '金', hidden: true, desc: '对 AI 爆了 10 次粗口。致敬 2012 年 Visual Studio 成就系统的 Potty Mouth', cur: S.swears, max: 10, val: `${S.swears} 次真情流露` },
+  { g: '微操', icon: '⏳', name: '已读不回', tier: '金', hidden: true, desc: 'AI 答完干等你 2 小时起步，共 5 次。它不困，你先睡', cur: S.waits, max: 5, val: `共 ${S.waits} 次，最长晾了 ${(S.maxWait / 36e5).toFixed(1)} 小时` },
 ];
 for (const a of A) a.ok = a.cur >= a.max;
 const unlocked = A.filter(a => a.ok);
 
 // ---------- HTML ----------
 const TIER_COLOR = { '铜': '#b08d57', '银': '#9fb4c7', '金': '#e8b339', '白金': '#7fd4d0' };
-const GROUPS = ['入门', '肝度', '钞能力', '微操'];
+const GROUPS = ['日常', '肝度', '钞能力', '微操'];
 const esc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;');
 
 function card(a) {
@@ -214,7 +245,7 @@ function card(a) {
     </div></div>`;
 }
 const sections = GROUPS.map(g => `
-  <h2>${{ '入门': '🌱', '肝度': '🌙', '钞能力': '💸', '微操': '🎮' }[g]} ${g}<span class="gs">${A.filter(a => a.g === g && a.ok).length}/${A.filter(a => a.g === g).length}</span></h2>
+  <h2>${{ '日常': '🌱', '肝度': '🌙', '钞能力': '💸', '微操': '🎮' }[g]} ${g}<span class="gs">${A.filter(a => a.g === g && a.ok).length}/${A.filter(a => a.g === g).length}</span></h2>
   <div class="grid">${A.filter(a => a.g === g).map(card).join('\n')}</div>`).join('\n');
 
 const html = `<!DOCTYPE html>
