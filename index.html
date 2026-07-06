@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>我的 vibecoding 成就</title>
+<style>
+  :root { color-scheme: dark; }
+  * { box-sizing: border-box; margin: 0; }
+  body { background: #14161b; color: #e8e6e3; font-family: -apple-system, "PingFang SC", "Noto Sans SC", sans-serif; padding: 28px 16px 60px; }
+  .wrap { max-width: 880px; margin: 0 auto; }
+  h1 { font-size: 26px; letter-spacing: 1px; }
+  h1 .sub { font-size: 13px; color: #8a8f98; font-weight: 400; margin-left: 10px; }
+  h2 { font-size: 16px; margin: 26px 0 10px; color: #c8ccd2; }
+  h2 .gs { font-size: 12px; color: #6b7280; margin-left: 8px; }
+  .stats { display: flex; flex-wrap: wrap; gap: 10px; margin: 18px 0 6px; }
+  .st { background: #1d2027; border: 1px solid #2a2e37; border-radius: 10px; padding: 10px 14px; }
+  .st b { display: block; font-size: 18px; color: #ffd76a; }
+  .st span { font-size: 12px; color: #8a8f98; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(390px, 100%), 1fr)); gap: 12px; }
+  .card { display: flex; gap: 14px; align-items: center; background: linear-gradient(135deg, #1d2027, #191c22); border: 1px solid #2a2e37; border-left: 4px solid var(--tc, #2a2e37); border-radius: 12px; padding: 13px 16px; cursor: pointer; position: relative; }
+  .card.ok { box-shadow: 0 0 18px -8px var(--tc); }
+  .card.plat.ok { background: linear-gradient(135deg, #1d2a2a, #191c22); }
+  .card.locked { opacity: .45; filter: grayscale(.6); }
+  .card.pick::after { content: "晒"; position: absolute; top: -8px; right: -6px; background: #e8b339; color: #14161b; font-size: 11px; font-weight: 700; padding: 2px 7px; border-radius: 10px; }
+  .ic { font-size: 32px; width: 46px; text-align: center; flex-shrink: 0; }
+  .nm { font-weight: 700; font-size: 15px; }
+  .tier { font-size: 11px; margin-left: 8px; padding: 1px 8px; border: 1px solid var(--tc); color: var(--tc); border-radius: 20px; vertical-align: 2px; }
+  .hdt { border-color: #8458b3; color: #a78bda; }
+  .ds { font-size: 12.5px; color: #9aa0aa; margin-top: 3px; }
+  .vl { font-size: 12.5px; color: #ffd76a; margin-top: 5px; }
+  .locked .vl { color: #6b7280; }
+  .pg { height: 5px; background: #2a2e37; border-radius: 4px; margin-top: 8px; overflow: hidden; }
+  .pgb { height: 100%; background: linear-gradient(90deg, #6b7280, #ffd76a); border-radius: 4px; }
+  .bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; gap: 12px; flex-wrap: wrap; }
+  button { background: #2a2e37; color: #e8e6e3; border: 1px solid #3a3f4b; border-radius: 8px; padding: 8px 14px; font-size: 13px; cursor: pointer; }
+  .tip { font-size: 12px; color: #565b64; margin-top: 4px; }
+  footer { margin-top: 34px; font-size: 12px; color: #565b64; text-align: center; line-height: 1.8; }
+  /* 晒图模式 */
+  body.share { padding-top: 40px; }
+  body.share .wrap { max-width: 620px; }
+  body.share h1 { text-align: center; }
+  body.share .bar { flex-direction: column; gap: 12px; }
+  body.share .stats { justify-content: center; }
+  body.share h2, body.share .tip, body.share .st.hideShare { display: none; }
+  body.share .grid { grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
+  body.share .card { padding: 11px 13px; cursor: default; }
+  body.share .card .ds { display: none; }
+  body.share .card.locked, body.share .card.noshare { display: none; }
+  body.share .card.pick::after { display: none; }
+  body.share footer { margin-top: 22px; }
+  body.share footer .big { font-size: 14px; color: #9aa0aa; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="bar">
+    <h1>🏆 我的 vibecoding 成就<span class="sub">解锁 25 / 26</span></h1>
+    <button onclick="toggleShare()">晒图模式</button>
+  </div>
+  <div class="stats">
+    <div class="st"><b>2026-04-11</b><span>入坑日</span></div>
+    <div class="st"><b>586</b><span>会话</span></div>
+    <div class="st"><b>72</b><span>活跃天</span></div>
+    <div class="st"><b>104.6 亿</b><span>累计 token（含缓存）</span></div>
+    <div class="st hideShare"><b>9201.3 万</b><span>输出 token</span></div>
+    <div class="st hideShare"><b>35485</b><span>工具调用</span></div>
+    <div class="st hideShare"><b>29</b><span>深夜场</span></div>
+  </div>
+  <div class="tip">点卡片选中「晒」标记，晒图模式只显示选中的；不选则默认晒金/白金。</div>
+
+  <h2>🌱 入门<span class="gs">5/5</span></h2>
+  <div class="grid"><div class="card ok" style="--tc:#b08d57" onclick="pick(this)">
+    <div class="ic">👋</div>
+    <div class="meta">
+      <div class="nm">Hello World<span class="tier">铜</span></div>
+      <div class="ds">第一次打开 Claude Code，从此再没亲手写过代码</div>
+      <div class="vl">入坑于 2026-04-11</div>
+    </div></div>
+<div class="card ok" style="--tc:#9fb4c7" onclick="pick(this)">
+    <div class="ic">🗺️</div>
+    <div class="meta">
+      <div class="nm">项目海王<span class="tier">银</span></div>
+      <div class="ds">同时撩 10 个以上项目，每一个都说过"这是主线"</div>
+      <div class="vl">134 个项目</div>
+    </div></div>
+<div class="card ok" style="--tc:#9fb4c7" onclick="pick(this)">
+    <div class="ic">🧰</div>
+    <div class="meta">
+      <div class="nm">装备党<span class="tier">银</span></div>
+      <div class="ds">MCP 工具调用 500 次，工具比活儿多</div>
+      <div class="vl">3354 次 MCP 调用</div>
+    </div></div>
+<div class="card ok" style="--tc:#b08d57" onclick="pick(this)">
+    <div class="ic">🖼️</div>
+    <div class="meta">
+      <div class="nm">一图胜千言<span class="tier">铜</span></div>
+      <div class="ds">截图一甩："就照这个做"，累计 10 张</div>
+      <div class="vl">甩过 83 张图</div>
+    </div></div>
+<div class="card ok" style="--tc:#9fb4c7" onclick="pick(this)">
+    <div class="ic">📚</div>
+    <div class="meta">
+      <div class="nm">提示词小说家<span class="tier">银</span></div>
+      <div class="ds">单条消息 500 字起步，这不是 prompt 是需求文档</div>
+      <div class="vl">最长一条 733925 字，超500字共 1442 条</div>
+    </div></div></div>
+
+  <h2>🌙 肝度<span class="gs">8/9</span></h2>
+  <div class="grid"><div class="card ok" style="--tc:#9fb4c7" onclick="pick(this)">
+    <div class="ic">🌙</div>
+    <div class="meta">
+      <div class="nm">凌晨三点俱乐部<span class="tier">银</span></div>
+      <div class="ds">02:00–06:00 还在 vibe，全世界只剩你和它的 loading</div>
+      <div class="vl">29 个深夜</div>
+    </div></div>
+<div class="card ok" style="--tc:#e8b339" onclick="pick(this)">
+    <div class="ic">🧛</div>
+    <div class="meta">
+      <div class="nm">吸血鬼作息<span class="tier">金</span></div>
+      <div class="ds">连续 3 天深夜营业，太阳升起前必须收工</div>
+      <div class="vl">连续 27 天深夜在线</div>
+    </div></div>
+<div class="card ok" style="--tc:#e8b339" onclick="pick(this)">
+    <div class="ic">🌅</div>
+    <div class="meta">
+      <div class="nm">日出见证者<span class="tier">金</span><span class="tier hdt">隐藏</span></div>
+      <div class="ds">清晨五点还在线。没人知道你是没睡，还是刚醒</div>
+      <div class="vl">14 次日出</div>
+    </div></div>
+<div class="card ok" style="--tc:#9fb4c7" onclick="pick(this)">
+    <div class="ic">📅</div>
+    <div class="meta">
+      <div class="nm">七天连勤<span class="tier">银</span></div>
+      <div class="ds">连续 7 天有会话。休息？那是模型维护日干的事</div>
+      <div class="vl">最长连勤 34 天</div>
+    </div></div>
+<div class="card locked" style="--tc:#e8b339" onclick="pick(this)">
+    <div class="ic">🔒</div>
+    <div class="meta">
+      <div class="nm">马拉松选手<span class="tier">金</span></div>
+      <div class="ds">一口气连续会话 6 小时，断档半小时算休息</div>
+      <div class="pg"><div class="pgb" style="width:82%"></div></div><div class="vl">4.9 / 6 · 坐下，别起来</div>
+    </div></div>
+<div class="card ok plat" style="--tc:#7fd4d0" onclick="pick(this)">
+    <div class="ic">🧘</div>
+    <div class="meta">
+      <div class="nm">全天候 Vibe<span class="tier">白金</span></div>
+      <div class="ds">睁眼第一件事和闭眼最后一件事是同一件事，单日跨度 16 小时</div>
+      <div class="vl">单日跨度 23.7 小时</div>
+    </div></div>
+<div class="card ok" style="--tc:#e8b339" onclick="pick(this)">
+    <div class="ic">🗓️</div>
+    <div class="meta">
+      <div class="nm">日理万机<span class="tier">金</span></div>
+      <div class="ds">单日开 15 场会话，每个窗口都在"快好了"</div>
+      <div class="vl">单日最多 49 场</div>
+    </div></div>
+<div class="card ok" style="--tc:#e8b339" onclick="pick(this)">
+    <div class="ic">🎪</div>
+    <div class="meta">
+      <div class="nm">多线程人格<span class="tier">金</span></div>
+      <div class="ds">同一小时 3 路会话并行：左手报错，右手"你说得对"</div>
+      <div class="vl">最高并行 13 路</div>
+    </div></div>
+<div class="card ok" style="--tc:#b08d57" onclick="pick(this)">
+    <div class="ic">🔁</div>
+    <div class="meta">
+      <div class="nm">我又回来了<span class="tier">铜</span><span class="tier hdt">隐藏</span></div>
+      <div class="ds">戒了 7 天，还是回来了</div>
+      <div class="vl">欢迎回家</div>
+    </div></div></div>
+
+  <h2>💸 钞能力<span class="gs">4/4</span></h2>
+  <div class="grid"><div class="card ok" style="--tc:#e8b339" onclick="pick(this)">
+    <div class="ic">🔥</div>
+    <div class="meta">
+      <div class="nm">烧 token 大户<span class="tier">金</span></div>
+      <div class="ds">单次会话烧掉 5000 万 token，电表都没你转得快</div>
+      <div class="vl">单会话纪录 7.3 亿</div>
+    </div></div>
+<div class="card ok plat" style="--tc:#7fd4d0" onclick="pick(this)">
+    <div class="ic">💯</div>
+    <div class="meta">
+      <div class="nm">亿级玩家<span class="tier">白金</span><span class="tier hdt">隐藏</span></div>
+      <div class="ds">单会话破 1 亿 token。致敬传说中 1.2 亿的那位</div>
+      <div class="vl">单会话纪录 7.3 亿</div>
+    </div></div>
+<div class="card ok" style="--tc:#e8b339" onclick="pick(this)">
+    <div class="ic">🐷</div>
+    <div class="meta">
+      <div class="nm">缓存白嫖怪<span class="tier">金</span></div>
+      <div class="ds">缓存命中累计 10 亿 token，省下的都是赚的</div>
+      <div class="vl">白嫖 97.1 亿</div>
+    </div></div>
+<div class="card ok" style="--tc:#9fb4c7" onclick="pick(this)">
+    <div class="ic">🚧</div>
+    <div class="meta">
+      <div class="nm">额度撞墙<span class="tier">银</span><span class="tier hdt">隐藏</span></div>
+      <div class="ds">撞过用量上限还回来继续，墙都不服就服你</div>
+      <div class="vl">这面墙记住你了</div>
+    </div></div></div>
+
+  <h2>🎮 微操<span class="gs">8/8</span></h2>
+  <div class="grid"><div class="card ok" style="--tc:#e8b339" onclick="pick(this)">
+    <div class="ic">🏗️</div>
+    <div class="meta">
+      <div class="nm">包工头<span class="tier">金</span></div>
+      <div class="ds">派出 100 个子代理，精通自己不干活的艺术</div>
+      <div class="vl">已派 361 个分身</div>
+    </div></div>
+<div class="card ok" style="--tc:#e8b339" onclick="pick(this)">
+    <div class="ic">🧨</div>
+    <div class="meta">
+      <div class="nm">一句话工程<span class="tier">金</span></div>
+      <div class="ds">一条指令，AI 连打 50 个工具调用不带喘</div>
+      <div class="vl">最长连击 297</div>
+    </div></div>
+<div class="card ok" style="--tc:#9fb4c7" onclick="pick(this)">
+    <div class="ic">🫡</div>
+    <div class="meta">
+      <div class="nm">你说得对学派<span class="tier">银</span></div>
+      <div class="ds">被 Claude 说过 50 次"你说得对"，而你确实说得对</div>
+      <div class="vl">82 次</div>
+    </div></div>
+<div class="card ok" style="--tc:#9fb4c7" onclick="pick(this)">
+    <div class="ic">🛑</div>
+    <div class="meta">
+      <div class="nm">刹车侠<span class="tier">银</span></div>
+      <div class="ds">按 20 次 Esc 打断输出。刹车是最后的尊严</div>
+      <div class="vl">踩了 106 脚刹车</div>
+    </div></div>
+<div class="card ok" style="--tc:#e8b339" onclick="pick(this)">
+    <div class="ic">🚢</div>
+    <div class="meta">
+      <div class="nm">Ship 机器<span class="tier">金</span></div>
+      <div class="ds">经手 100 个 commit，信息还都写得比你好</div>
+      <div class="vl">187 个 commit</div>
+    </div></div>
+<div class="card ok" style="--tc:#9fb4c7" onclick="pick(this)">
+    <div class="ic">💥</div>
+    <div class="meta">
+      <div class="nm">上下文爆破手<span class="tier">银</span></div>
+      <div class="ds">把对话聊到失忆 10 次，compact 是一种境界</div>
+      <div class="vl">31 次失忆</div>
+    </div></div>
+<div class="card ok" style="--tc:#9fb4c7" onclick="pick(this)">
+    <div class="ic">🎰</div>
+    <div class="meta">
+      <div class="nm">全家桶收集者<span class="tier">银</span></div>
+      <div class="ds">用过 3 种以上模型：Opus 干活，Haiku 跑腿，Sonnet 背锅</div>
+      <div class="vl">7 种模型</div>
+    </div></div>
+<div class="card ok" style="--tc:#b08d57" onclick="pick(this)">
+    <div class="ic">🙋</div>
+    <div class="meta">
+      <div class="nm">甲方本人<span class="tier">铜</span></div>
+      <div class="ds">被 AI 反过来追问 20 次需求，这就是话语权</div>
+      <div class="vl">被追问 136 次</div>
+    </div></div></div>
+  <footer><span class="big">数据全部来自本地真实日志，一条没编。</span><br>本地离线生成 · 数据不出这台电脑 · vibe-trophy v0.2（占位名）</footer>
+</div>
+<script>
+function pick(el) {
+  if (document.body.classList.contains('share') || el.classList.contains('locked')) return;
+  el.classList.toggle('pick');
+}
+function toggleShare() {
+  const b = document.body, cards = [...document.querySelectorAll('.card.ok')];
+  if (!b.classList.contains('share')) {
+    const picked = cards.filter(c => c.classList.contains('pick'));
+    const show = picked.length ? picked : cards.filter(c => /金/.test(c.querySelector('.tier').textContent));
+    cards.forEach(c => c.classList.toggle('noshare', !show.includes(c)));
+  }
+  b.classList.toggle('share');
+}
+</script>
+</body>
+</html>
