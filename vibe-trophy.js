@@ -1,7 +1,8 @@
 #!/usr/bin/env node
-// vibe-trophy（占位名）v0.2 · 从本地 Claude Code 日志生成你的 vibecoding 成就卡
-// 用法: node vibe-trophy.js [--tz=Asia/Shanghai] [--out=index.html]
-// 只读 ~/.claude/projects/**/*.jsonl，全程离线，不上传任何数据。
+// vibe-trophy（占位名）v0.4 · 从本地 AI 编程日志生成你的 vibecoding 成就
+// 支持: Claude Code / Codex / OpenClaw（适配器架构，有本地日志的平台都能接）
+// 用法: node vibe-trophy.js [--tz=Asia/Shanghai] [--out=index.html] [--src=claude,codex,openclaw]
+// 只读本地日志，零依赖，不联网，数据不出这台电脑。
 'use strict';
 const fs = require('fs');
 const path = require('path');
@@ -13,22 +14,104 @@ const arg = (k, d) => {
 };
 const TZ = arg('tz', 'Asia/Shanghai');
 const OUT = path.resolve(__dirname, arg('out', 'index.html'));
-const ROOT = path.join(os.homedir(), '.claude', 'projects');
+const ONLY = arg('src', '').split(',').filter(Boolean);
 
-// ---------- 收集文件 ----------
-const files = [];
-(function walk(d) {
+function walk(d, out = []) {
   let es;
-  try { es = fs.readdirSync(d, { withFileTypes: true }); } catch { return; }
+  try { es = fs.readdirSync(d, { withFileTypes: true }); } catch { return out; }
   for (const e of es) {
     const p = path.join(d, e.name);
-    if (e.isDirectory()) walk(p);
-    else if (e.name.endsWith('.jsonl')) files.push(p);
+    if (e.isDirectory()) walk(p, out);
+    else if (e.name.endsWith('.jsonl')) out.push(p);
   }
-})(ROOT);
-if (!files.length) { console.error(`没找到日志: ${ROOT}`); process.exit(1); }
+  return out;
+}
+const H = os.homedir();
+const num = (u, ...keys) => { for (const k of keys) if (u && typeof u[k] === 'number') return u[k]; return 0; };
+const textOf = c => typeof c === 'string' ? c.trim()
+  : Array.isArray(c) ? c.filter(b => (b.type === 'text' || b.type === 'input_text' || b.type === 'output_text') && b.text).map(b => b.text.trim()).join('\n').trim() : '';
 
-// ---------- 时区换算 ----------
+// ---------- 平台适配器：把各家日志翻译成同一种事件 ----------
+// 归一化事件 o: {ts, cwd, model, usage{in,out,cc,cr}, typed, interrupt, images, tools[], aText, compact, limit, side}
+const SOURCES = [
+  {
+    id: 'claude', name: 'Claude Code',
+    files: () => walk(path.join(H, '.claude', 'projects')),
+    parse(j, raw) {
+      const o = { ts: j.timestamp ? Date.parse(j.timestamp) : NaN, cwd: j.cwd, side: j.isSidechain === true };
+      if (j.type === 'summary' || j.isCompactSummary) o.compact = true;
+      if (/usage limit|rate limit reached|limit reached|额度|上限已/i.test(raw)) o.limit = true;
+      const m = j.message;
+      if (m) {
+        const u = m.usage;
+        if (u) o.usage = { in: num(u, 'input_tokens'), out: num(u, 'output_tokens'), cc: num(u, 'cache_creation_input_tokens'), cr: num(u, 'cache_read_input_tokens') };
+        if (m.model && m.model !== '<synthetic>') o.model = m.model;
+        const c = m.content;
+        if (j.type === 'user') {
+          o.typed = textOf(c);
+          o.interrupt = typeof c === 'string' ? c.includes('[Request interrupted') : Array.isArray(c) && c.some(b => b.type === 'text' && b.text && b.text.includes('[Request interrupted'));
+          o.images = Array.isArray(c) ? c.filter(b => b.type === 'image').length : 0;
+        } else if (j.type === 'assistant' && Array.isArray(c)) {
+          o.tools = c.filter(b => b.type === 'tool_use').map(b => b.name || '');
+          o.aText = c.filter(b => b.type === 'text' && b.text).map(b => b.text).join('\n');
+        }
+      }
+      return o;
+    },
+  },
+  {
+    id: 'codex', name: 'Codex',
+    files: () => [...walk(path.join(H, '.codex', 'sessions')), ...walk(path.join(H, '.codex', 'archived_sessions'))],
+    parse(j) {
+      const p = j.payload || {};
+      const o = { ts: j.timestamp ? Date.parse(j.timestamp) : NaN };
+      if (j.type === 'session_meta') { o.cwd = p.cwd; return o; }
+      if (j.type === 'turn_context') { if (p.model) o.model = `codex/${p.model}`; return o; }
+      if (j.type === 'event_msg') {
+        if (p.type === 'token_count') {
+          const u = p.info && p.info.last_token_usage;
+          if (u) o.usage = { in: num(u, 'input_tokens'), out: num(u, 'output_tokens'), cc: 0, cr: num(u, 'cached_input_tokens') };
+        }
+        if (p.type === 'turn_aborted') o.interrupt = true;
+        return o;
+      }
+      if (j.type === 'response_item') {
+        if (p.type === 'message' && p.role === 'user') o.typed = textOf(p.content);
+        else if (p.type === 'message' && p.role === 'assistant') o.aText = textOf(p.content);
+        else if (p.type === 'function_call' || p.type === 'local_shell_call' || p.type === 'custom_tool_call') o.tools = [p.name || 'shell'];
+        return o;
+      }
+      return o;
+    },
+  },
+  {
+    id: 'openclaw', name: 'OpenClaw',
+    files: () => walk(path.join(H, '.openclaw', 'agents')).filter(f => /\/sessions\//.test(f) && !f.includes('.trajectory.')),
+    parse(j) {
+      const o = { ts: j.timestamp ? Date.parse(j.timestamp) : NaN };
+      if (j.type === 'session') { o.cwd = j.cwd; return o; }
+      if (j.type === 'model_change') { if (j.modelId) o.model = `${j.provider || 'openclaw'}/${j.modelId}`; return o; }
+      if (j.type === 'message') {
+        const m = j.message || {};
+        const u = m.usage;
+        if (u) o.usage = { in: num(u, 'input_tokens', 'input'), out: num(u, 'output_tokens', 'output'), cc: num(u, 'cache_creation_input_tokens', 'cacheWrite'), cr: num(u, 'cache_read_input_tokens', 'cacheRead') };
+        const c = m.content;
+        if (m.role === 'user') {
+          o.typed = textOf(c);
+          o.images = Array.isArray(c) ? c.filter(b => b.type === 'image').length : 0;
+        } else if (m.role === 'assistant') {
+          if (Array.isArray(c)) {
+            o.tools = c.filter(b => b.type === 'toolCall' || b.type === 'tool_use' || b.type === 'tool-call').map(b => b.name || b.toolName || '');
+            o.aText = c.filter(b => b.type === 'text' && b.text).map(b => b.text).join('\n');
+          } else o.aText = textOf(c);
+        }
+      }
+      return o;
+    },
+  },
+];
+
+// ---------- 时区 ----------
 const dtf = new Intl.DateTimeFormat('en-CA', {
   timeZone: TZ, year: 'numeric', month: '2-digit', day: '2-digit',
   hour: '2-digit', minute: '2-digit', hour12: false,
@@ -49,112 +132,112 @@ const S = {
   thanks: 0, swears: 0, tiny: 0, repeats: 0, urls: 0, waits: 0, maxWait: 0,
   lunch: new Set(), dinner: new Set(),
   projects: new Set(), longestRun: 0, maxBurst: 0, daySpan: {}, hourSessions: {}, daySessions: {},
-  limitHit: false, firstTs: Infinity, lastTs: 0,
+  limitHit: false, firstTs: Infinity, lastTs: 0, bySrc: {},
 };
 const RIGHT_RE = /you'?re absolutely right|你说得对|你是对的/i;
+const active = SOURCES.filter(s => (!ONLY.length || ONLY.includes(s.id)));
 
-for (const f of files) {
-  let lines;
-  try { lines = fs.readFileSync(f, 'utf8').split('\n'); } catch { continue; }
-  let sTokens = 0, evts = [], isSide = false, sawFirst = false, burst = 0, prevTyped = '', fileLastTs = NaN;
-  for (const line of lines) {
-    if (!line.trim()) continue;
-    let j; try { j = JSON.parse(line); } catch { continue; }
-    if (!sawFirst && typeof j.isSidechain === 'boolean') { isSide = j.isSidechain; sawFirst = true; }
-    if (j.type === 'summary' || j.isCompactSummary) S.compacts++;
-    const ts = j.timestamp ? Date.parse(j.timestamp) : NaN;
-    let lineGap = NaN;
-    if (!isNaN(ts)) {
-      if (!isNaN(fileLastTs)) lineGap = ts - fileLastTs;
-      fileLastTs = ts;
-      evts.push(ts);
-      S.firstTs = Math.min(S.firstTs, ts); S.lastTs = Math.max(S.lastTs, ts);
-      const { date, hour } = local(ts);
-      S.days.add(date);
-      if (hour >= 2 && hour < 6) S.nightDays.add(date);
-      if (hour === 5) S.dawnDays.add(date);
-      if (hour === 12 || hour === 13) S.lunch.add(date);
-      if (hour === 18 || hour === 19) S.dinner.add(date);
-      if (!S.daySpan[date]) S.daySpan[date] = [ts, ts];
-      S.daySpan[date][0] = Math.min(S.daySpan[date][0], ts);
-      S.daySpan[date][1] = Math.max(S.daySpan[date][1], ts);
-      if (!isSide) {
-        (S.hourSessions[`${date}T${hour}`] ||= new Set()).add(f);
-        (S.daySessions[date] ||= new Set()).add(f);
-      }
-    }
-    if (j.cwd) S.projects.add(j.cwd);
-    const m = j.message;
-    if (m) {
-      S.msgs++;
-      const u = m.usage;
-      if (u) {
-        const t = (u.input_tokens || 0) + (u.output_tokens || 0) +
-          (u.cache_creation_input_tokens || 0) + (u.cache_read_input_tokens || 0);
-        sTokens += t;
-        S.tokens.in += u.input_tokens || 0; S.tokens.out += u.output_tokens || 0;
-        S.tokens.cc += u.cache_creation_input_tokens || 0; S.tokens.cr += u.cache_read_input_tokens || 0;
-      }
-      if (m.model && m.model !== '<synthetic>') S.models.set(m.model, (S.models.get(m.model) || 0) + 1);
-      const c = m.content;
-      if (j.type === 'user') {
-        let typedText = '', hasInterrupt = false;
-        if (typeof c === 'string') { typedText = c.trim(); hasInterrupt = c.includes('[Request interrupted'); }
-        else if (Array.isArray(c)) {
-          const parts = [];
-          for (const b of c) {
-            if (b.type === 'text' && b.text) {
-              parts.push(b.text.trim());
-              if (b.text.includes('[Request interrupted')) hasInterrupt = true;
-            } else if (b.type === 'image') S.images++;
-          }
-          typedText = parts.join('\n').trim();
+for (const src of active) {
+  const files = src.files();
+  if (!files.length) continue;
+  const B = S.bySrc[src.id] = { name: src.name, sessions: 0, tokens: 0 };
+  for (const f of files) {
+    let lines;
+    try { lines = fs.readFileSync(f, 'utf8').split('\n'); } catch { continue; }
+    let sTokens = 0, evts = [], isSide = false, burst = 0, prevTyped = '', fileLastTs = NaN;
+    for (const raw of lines) {
+      if (!raw.trim()) continue;
+      let j; try { j = JSON.parse(raw); } catch { continue; }
+      let o; try { o = src.parse(j, raw); } catch { continue; }
+      if (!o) continue;
+      if (o.side) isSide = true;
+      if (o.compact) S.compacts++;
+      if (o.limit) S.limitHit = true;
+      let lineGap = NaN;
+      const ts = o.ts;
+      if (!isNaN(ts)) {
+        if (!isNaN(fileLastTs)) lineGap = ts - fileLastTs;
+        fileLastTs = ts;
+        evts.push(ts);
+        S.firstTs = Math.min(S.firstTs, ts); S.lastTs = Math.max(S.lastTs, ts);
+        const { date, hour } = local(ts);
+        S.days.add(date);
+        if (hour >= 2 && hour < 6) S.nightDays.add(date);
+        if (hour === 5) S.dawnDays.add(date);
+        if (hour === 12 || hour === 13) S.lunch.add(date);
+        if (hour === 18 || hour === 19) S.dinner.add(date);
+        if (!S.daySpan[date]) S.daySpan[date] = [ts, ts];
+        S.daySpan[date][0] = Math.min(S.daySpan[date][0], ts);
+        S.daySpan[date][1] = Math.max(S.daySpan[date][1], ts);
+        if (!isSide) {
+          (S.hourSessions[`${date}T${hour}`] ||= new Set()).add(f);
+          (S.daySessions[date] ||= new Set()).add(f);
         }
-        const typedLen = typedText.length;
-        if (hasInterrupt) S.interrupts++;
-        if (typedLen > 0 && !hasInterrupt) {
-          burst = 0; // 真人开口，连击重计
-          if (typedLen > S.maxPromptLen) S.maxPromptLen = typedLen;
-          if (typedLen >= 500) S.longPrompts++;
-          // 风格统计：跳过工具/系统注入的消息（<tag> 开头等）
-          if (!/^</.test(typedText) && !/<command-|<local-command|<system-reminder/.test(typedText)) {
-            if (/谢谢|辛苦了|thank/i.test(typedText)) S.thanks++;
-            if (/卧槽|我靠|妈的|他妈|tmd|艹|fuck|shit|wtf/i.test(typedText)) S.swears++;
-            if (typedLen <= 2) S.tiny++;
-            if (/https?:\/\//.test(typedText)) S.urls++;
-            if (typedText === prevTyped && typedLen >= 2) S.repeats++;
-            prevTyped = typedText;
-            if (lineGap >= 2 * 36e5) { S.waits++; if (lineGap > S.maxWait) S.maxWait = lineGap; }
-          }
+      }
+      if (o.cwd) S.projects.add(o.cwd);
+      if (o.model) S.models.set(o.model, (S.models.get(o.model) || 0) + 1);
+      if (o.usage) {
+        const t = o.usage.in + o.usage.out + o.usage.cc + o.usage.cr;
+        sTokens += t; B.tokens += t;
+        S.tokens.in += o.usage.in; S.tokens.out += o.usage.out; S.tokens.cc += o.usage.cc; S.tokens.cr += o.usage.cr;
+      }
+      if (o.images) S.images += o.images;
+      if (o.interrupt) S.interrupts++;
+      if (o.tools) {
+        for (const name of o.tools) {
+          burst++; S.toolCalls++;
+          if (burst > S.maxBurst) S.maxBurst = burst;
+          if (name === 'Task' || name === 'Agent') S.taskCalls++;
+          if (name === 'AskUserQuestion') S.askCalls++;
+          if (/^mcp__/.test(name)) S.mcpCalls++;
         }
-      } else if (j.type === 'assistant' && Array.isArray(c)) {
-        for (const b of c) {
-          if (b.type === 'tool_use') {
-            burst++; S.toolCalls++;
-            if (burst > S.maxBurst) S.maxBurst = burst;
-            if (b.name === 'Task' || b.name === 'Agent') S.taskCalls++;
-            if (b.name === 'AskUserQuestion') S.askCalls++;
-            if (/^mcp__/.test(b.name || '')) S.mcpCalls++;
-            if (b.name === 'Bash' && b.input && typeof b.input.command === 'string' && /git commit/.test(b.input.command)) S.gitCommits++;
-          } else if (b.type === 'text' && b.text && RIGHT_RE.test(b.text)) S.saidRight++;
+        S.msgs++;
+      }
+      if (o.aText) {
+        if (RIGHT_RE.test(o.aText)) S.saidRight++;
+        S.msgs++;
+      }
+      // git commit 检测：CC 的 Bash 工具入参
+      if (o.tools && o.tools.includes('Bash') && j.message && Array.isArray(j.message.content)) {
+        for (const b of j.message.content) {
+          if (b.type === 'tool_use' && b.name === 'Bash' && b.input && typeof b.input.command === 'string' && /git commit/.test(b.input.command)) S.gitCommits++;
+        }
+      }
+      if (typeof o.typed === 'string' && o.typed.length > 0 && !o.interrupt) {
+        const typedText = o.typed, typedLen = typedText.length;
+        S.msgs++;
+        burst = 0; // 真人开口，连击重计
+        if (typedLen > S.maxPromptLen) S.maxPromptLen = typedLen;
+        if (typedLen >= 500) S.longPrompts++;
+        // 风格统计：跳过工具/系统/cron 注入的消息（<tag> 或 [xxx] 开头）
+        if (!/^[<\[]/.test(typedText) && !/<command-|<local-command|<system-reminder/.test(typedText)) {
+          if (/谢谢|辛苦了|thank/i.test(typedText)) S.thanks++;
+          if (/卧槽|我靠|妈的|他妈|tmd|艹|fuck|shit|wtf/i.test(typedText)) S.swears++;
+          if (typedLen <= 2) S.tiny++;
+          if (/https?:\/\//.test(typedText)) S.urls++;
+          if (typedText === prevTyped && typedLen >= 2) S.repeats++;
+          prevTyped = typedText;
+          if (lineGap >= 2 * 36e5) { S.waits++; if (lineGap > S.maxWait) S.maxWait = lineGap; }
         }
       }
     }
-    if (!S.limitHit && /usage limit|rate limit|limit reached|额度|上限已/i.test(line)) S.limitHit = true;
+    if (!isSide && evts.length) { S.sessions++; B.sessions++; }
+    if (sTokens > S.maxSessionTokens) S.maxSessionTokens = sTokens;
+    evts.sort((a, b) => a - b);
+    let run = 0;
+    for (let i = 1; i < evts.length; i++) {
+      if (evts[i] - evts[i - 1] <= 30 * 60e3) { run += evts[i] - evts[i - 1]; if (run > S.longestRun) S.longestRun = run; }
+      else run = 0;
+    }
   }
-  if (!isSide && evts.length) S.sessions++;
-  if (sTokens > S.maxSessionTokens) S.maxSessionTokens = sTokens;
-  evts.sort((a, b) => a - b);
-  let run = 0;
-  for (let i = 1; i < evts.length; i++) {
-    if (evts[i] - evts[i - 1] <= 30 * 60e3) { run += evts[i] - evts[i - 1]; if (run > S.longestRun) S.longestRun = run; }
-    else run = 0;
-  }
+  if (!B.sessions) delete S.bySrc[src.id];
 }
+const srcOn = Object.values(S.bySrc);
+if (!S.sessions) { console.error('没找到任何平台的本地日志'); process.exit(1); }
 
 // ---------- 派生指标 ----------
 const dayN = d => Math.round(Date.parse(d) / 86400e3);
-const consec = set => { // 集合里最长连续天数
+const consec = set => {
   const ds = [...set].sort(); let s = 0, b = 0, p = null;
   for (const d of ds) { s = (p !== null && dayN(d) - p === 1) ? s + 1 : 1; if (s > b) b = s; p = dayN(d); }
   return b;
@@ -176,12 +259,14 @@ const totalTokens = S.tokens.in + S.tokens.out + S.tokens.cc + S.tokens.cr;
 const yi = n => n >= 1e8 ? `${(n / 1e8).toFixed(1)} 亿` : n >= 1e4 ? `${(n / 1e4).toFixed(1)} 万` : `${n}`;
 const hrs = ms => ms / 36e5;
 const h1 = h => `${Math.floor(h)} 小时 ${Math.round(h % 1 * 60)} 分`;
+const srcNames = srcOn.map(b => b.name).join(' + ');
 
 // ---------- 成就定义 ----------
-// cur/max 数值型给进度条；bool 型只给 hint
 const A = [
   // 🌱 日常
-  { g: '日常', icon: '👋', name: 'Hello World', tier: '铜', desc: '第一次打开 Claude Code，从此再没亲手写过代码', cur: S.sessions, max: 1, val: `入坑于 ${isFinite(S.firstTs) ? local(S.firstTs).date : '?'}` },
+  { g: '日常', icon: '👋', name: 'Hello World', tier: '铜', desc: '第一次打开 AI 编程工具，从此再没亲手写过代码', cur: S.sessions, max: 1, val: `入坑于 ${isFinite(S.firstTs) ? local(S.firstTs).date : '?'}` },
+  { g: '日常', icon: '🧩', name: '跨栈玩家', tier: '金', desc: '同时驯服 2 个以上 AI 编程平台，鸡蛋不放一个篮子', cur: srcOn.length, max: 2, val: `${srcOn.length} 个平台：${srcNames}` },
+  { g: '日常', icon: '🛸', name: '全栈指挥官', tier: '白金', hidden: true, desc: '3 个平台同时在册，你不是用户，你是舰队司令', cur: srcOn.length, max: 3, val: `舰队编制：${srcNames}` },
   { g: '日常', icon: '🗺️', name: '项目海王', tier: '银', desc: '同时撩 10 个以上项目，每一个都说过"这是主线"', cur: S.projects.size, max: 10, val: `${S.projects.size} 个项目` },
   { g: '日常', icon: '🧰', name: '装备党', tier: '银', desc: 'MCP 工具调用 500 次，工具比活儿多', cur: S.mcpCalls, max: 500, val: `${S.mcpCalls} 次 MCP 调用` },
   { g: '日常', icon: '🖼️', name: '一图胜千言', tier: '铜', desc: '截图一甩："就照这个做"，累计 10 张', cur: S.images, max: 10, val: `甩过 ${S.images} 张图` },
@@ -210,11 +295,11 @@ const A = [
   // 🎮 微操
   { g: '微操', icon: '🏗️', name: '包工头', tier: '金', desc: '派出 100 个子代理，精通自己不干活的艺术', cur: S.taskCalls, max: 100, val: `已派 ${S.taskCalls} 个分身` },
   { g: '微操', icon: '🧨', name: '一句话工程', tier: '金', desc: '一条指令，AI 连打 50 个工具调用不带喘', cur: S.maxBurst, max: 50, val: `最长连击 ${S.maxBurst}` },
-  { g: '微操', icon: '🫡', name: '你说得对学派', tier: '银', desc: '被 Claude 说过 50 次"你说得对"，而你确实说得对', cur: S.saidRight, max: 50, val: `${S.saidRight} 次` },
+  { g: '微操', icon: '🫡', name: '你说得对学派', tier: '银', desc: '被 AI 说过 50 次"你说得对"，而你确实说得对', cur: S.saidRight, max: 50, val: `${S.saidRight} 次` },
   { g: '微操', icon: '🛑', name: '刹车侠', tier: '银', desc: '按 20 次 Esc 打断输出。刹车是最后的尊严', cur: S.interrupts, max: 20, val: `踩了 ${S.interrupts} 脚刹车` },
   { g: '微操', icon: '🚢', name: 'Ship 机器', tier: '金', desc: '经手 100 个 commit，信息还都写得比你好', cur: S.gitCommits, max: 100, val: `${S.gitCommits} 个 commit` },
   { g: '微操', icon: '💥', name: '上下文爆破手', tier: '银', desc: '把对话聊到失忆 10 次，compact 是一种境界', cur: S.compacts, max: 10, val: `${S.compacts} 次失忆` },
-  { g: '微操', icon: '🎰', name: '全家桶收集者', tier: '银', desc: '用过 3 种以上模型：Opus 干活，Haiku 跑腿，Sonnet 背锅', cur: S.models.size, max: 3, val: `${S.models.size} 种模型` },
+  { g: '微操', icon: '🎰', name: '全家桶收集者', tier: '银', desc: '用过 3 种以上模型：有的干活，有的跑腿，有的背锅', cur: S.models.size, max: 3, val: `${S.models.size} 种模型` },
   { g: '微操', icon: '🙋', name: '甲方本人', tier: '铜', desc: '被 AI 反过来追问 20 次需求，这就是话语权', cur: S.askCalls, max: 20, val: `被追问 ${S.askCalls} 次` },
   { g: '微操', icon: '🙏', name: '人机礼仪模范', tier: '铜', desc: '对 AI 说了 20 次谢谢。它记不住，但你是好人', cur: S.thanks, max: 20, val: `${S.thanks} 次感谢` },
   { g: '微操', icon: '🤬', name: '口吐芬芳', tier: '金', hidden: true, desc: '对 AI 爆了 10 次粗口。致敬 2012 年 Visual Studio 成就系统的 Potty Mouth', cur: S.swears, max: 10, val: `${S.swears} 次真情流露` },
@@ -267,6 +352,8 @@ const html = `<!DOCTYPE html>
   .st { background: #1d2027; border: 1px solid #2a2e37; border-radius: 10px; padding: 10px 14px; }
   .st b { display: block; font-size: 18px; color: #ffd76a; }
   .st span { font-size: 12px; color: #8a8f98; }
+  .srcs { font-size: 12.5px; color: #8a8f98; margin: 8px 0 0; }
+  .srcs b { color: #c8ccd2; font-weight: 600; }
   .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(390px, 100%), 1fr)); gap: 12px; }
   .card { display: flex; gap: 14px; align-items: center; background: linear-gradient(135deg, #1d2027, #191c22); border: 1px solid #2a2e37; border-left: 4px solid var(--tc, #2a2e37); border-radius: 12px; padding: 13px 16px; cursor: pointer; position: relative; }
   .card.ok { box-shadow: 0 0 18px -8px var(--tc); }
@@ -286,13 +373,13 @@ const html = `<!DOCTYPE html>
   button { background: #2a2e37; color: #e8e6e3; border: 1px solid #3a3f4b; border-radius: 8px; padding: 8px 14px; font-size: 13px; cursor: pointer; }
   .tip { font-size: 12px; color: #565b64; margin-top: 4px; }
   footer { margin-top: 34px; font-size: 12px; color: #565b64; text-align: center; line-height: 1.8; }
-  /* 晒图模式 */
   body.share { padding-top: 40px; }
   body.share .wrap { max-width: 620px; }
   body.share h1 { text-align: center; }
   body.share .bar { flex-direction: column; gap: 12px; }
   body.share .stats { justify-content: center; }
   body.share h2, body.share .tip, body.share .st.hideShare { display: none; }
+  body.share .srcs { text-align: center; }
   body.share .grid { grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
   body.share .card { padding: 11px 13px; cursor: default; }
   body.share .card .ds { display: none; }
@@ -317,9 +404,10 @@ const html = `<!DOCTYPE html>
     <div class="st hideShare"><b>${S.toolCalls}</b><span>工具调用</span></div>
     <div class="st hideShare"><b>${S.nightDays.size}</b><span>深夜场</span></div>
   </div>
+  <div class="srcs">🧩 已接入 <b>${srcOn.length}</b> 个平台：${srcOn.map(b => `<b>${esc(b.name)}</b> ${b.sessions} 场`).join(' · ')}</div>
   <div class="tip">点卡片选中「晒」标记，晒图模式只显示选中的；不选则默认晒金/白金。</div>
 ${sections}
-  <footer><span class="big">数据全部来自本地真实日志，一条没编。</span><br>本地离线生成 · 数据不出这台电脑 · vibe-trophy v0.3（占位名）</footer>
+  <footer><span class="big">数据全部来自本地真实日志，一条没编。</span><br>已接入 ${srcOn.length} 平台（${esc(srcNames)}）· 本地离线生成 · 数据不出这台电脑 · vibe-trophy v0.4（占位名）</footer>
 </div>
 <script>
 function pick(el) {
@@ -341,6 +429,7 @@ function toggleShare() {
 
 fs.writeFileSync(OUT, html);
 console.log(`✅ ${OUT}`);
+console.log(`平台: ${srcOn.map(b => `${b.name} ${b.sessions} 场/${yi(b.tokens)} token`).join(' · ')}`);
 console.log(`解锁 ${unlocked.length}/${A.length}`);
 for (const g of GROUPS) console.log(`  ${g}: ${A.filter(a => a.g === g).map(a => (a.ok ? a.icon : '🔒') + a.name).join(' ')}`);
-console.log(`会话 ${S.sessions} · 活跃 ${S.days.size} 天 · 累计 ${yi(totalTokens)} token · 峰值 ${yi(S.maxSessionTokens)}/会话 · 连击 ${S.maxBurst} · commit ${S.gitCommits} · 刹车 ${S.interrupts} · 失忆 ${S.compacts}`);
+console.log(`会话 ${S.sessions} · 活跃 ${S.days.size} 天 · 累计 ${yi(totalTokens)} token · 峰值 ${yi(S.maxSessionTokens)}/会话 · 连击 ${S.maxBurst} · 模型 ${S.models.size} 种`);
