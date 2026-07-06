@@ -144,7 +144,7 @@ for (const src of active) {
   for (const f of files) {
     let lines;
     try { lines = fs.readFileSync(f, 'utf8').split('\n'); } catch { continue; }
-    let sTokens = 0, evts = [], isSide = false, burst = 0, prevTyped = '', fileLastTs = NaN;
+    let sTokens = 0, evts = [], isSide = false, burst = 0, prevTyped = '', fileLastTs = NaN, fileAuto = false;
     for (const raw of lines) {
       if (!raw.trim()) continue;
       let j; try { j = JSON.parse(raw); } catch { continue; }
@@ -160,19 +160,6 @@ for (const src of active) {
         fileLastTs = ts;
         evts.push(ts);
         S.firstTs = Math.min(S.firstTs, ts); S.lastTs = Math.max(S.lastTs, ts);
-        const { date, hour } = local(ts);
-        S.days.add(date);
-        if (hour >= 2 && hour < 6) S.nightDays.add(date);
-        if (hour === 5) S.dawnDays.add(date);
-        if (hour === 12 || hour === 13) S.lunch.add(date);
-        if (hour === 18 || hour === 19) S.dinner.add(date);
-        if (!S.daySpan[date]) S.daySpan[date] = [ts, ts];
-        S.daySpan[date][0] = Math.min(S.daySpan[date][0], ts);
-        S.daySpan[date][1] = Math.max(S.daySpan[date][1], ts);
-        if (!isSide) {
-          (S.hourSessions[`${date}T${hour}`] ||= new Set()).add(f);
-          (S.daySessions[date] ||= new Set()).add(f);
-        }
       }
       if (o.cwd) S.projects.add(o.cwd);
       if (o.model) S.models.set(o.model, (S.models.get(o.model) || 0) + 1);
@@ -207,10 +194,11 @@ for (const src of active) {
         const typedText = o.typed, typedLen = typedText.length;
         S.msgs++;
         burst = 0; // 真人开口，连击重计
-        if (typedLen > S.maxPromptLen) S.maxPromptLen = typedLen;
-        if (typedLen >= 500) S.longPrompts++;
+        if (/^\[cron:/.test(typedText)) fileAuto = true; // cron 拉起的会话，不算人肝的
         // 风格统计：跳过工具/系统/cron 注入的消息（<tag> 或 [xxx] 开头）
         if (!/^[<\[]/.test(typedText) && !/<command-|<local-command|<system-reminder/.test(typedText)) {
+          if (typedLen > S.maxPromptLen) S.maxPromptLen = typedLen;
+          if (typedLen >= 500) S.longPrompts++;
           if (/谢谢|辛苦了|thank/i.test(typedText)) S.thanks++;
           if (/卧槽|我靠|妈的|他妈|tmd|艹|fuck|shit|wtf/i.test(typedText)) S.swears++;
           if (typedLen <= 2) S.tiny++;
@@ -223,11 +211,29 @@ for (const src of active) {
     }
     if (!isSide && evts.length) { S.sessions++; B.sessions++; }
     if (sTokens > S.maxSessionTokens) S.maxSessionTokens = sTokens;
-    evts.sort((a, b) => a - b);
-    let run = 0;
-    for (let i = 1; i < evts.length; i++) {
-      if (evts[i] - evts[i - 1] <= 30 * 60e3) { run += evts[i] - evts[i - 1]; if (run > S.longestRun) S.longestRun = run; }
-      else run = 0;
+    // 时间类指标（肝度组的原料）只算人类会话，cron 拉起的不算
+    if (!fileAuto && evts.length) {
+      evts.sort((a, b) => a - b);
+      let run = 0;
+      for (let i = 1; i < evts.length; i++) {
+        if (evts[i] - evts[i - 1] <= 30 * 60e3) { run += evts[i] - evts[i - 1]; if (run > S.longestRun) S.longestRun = run; }
+        else run = 0;
+      }
+      for (const ts of evts) {
+        const { date, hour } = local(ts);
+        S.days.add(date);
+        if (hour >= 2 && hour < 6) S.nightDays.add(date);
+        if (hour === 5) S.dawnDays.add(date);
+        if (hour === 12 || hour === 13) S.lunch.add(date);
+        if (hour === 18 || hour === 19) S.dinner.add(date);
+        if (!S.daySpan[date]) S.daySpan[date] = [ts, ts];
+        S.daySpan[date][0] = Math.min(S.daySpan[date][0], ts);
+        S.daySpan[date][1] = Math.max(S.daySpan[date][1], ts);
+        if (!isSide) {
+          (S.hourSessions[`${date}T${hour}`] ||= new Set()).add(f);
+          (S.daySessions[date] ||= new Set()).add(f);
+        }
+      }
     }
   }
   if (!B.sessions) delete S.bySrc[src.id];
