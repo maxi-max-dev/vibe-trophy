@@ -51,6 +51,7 @@
   .pgb { height: 100%; background: linear-gradient(90deg, #7a6a45, #ffd76a); border-radius: 4px; }
   button, .lswitch { background: #1d2027; color: #e8e6e3; border: 1px solid #2f3440; border-radius: 9px; padding: 8px 14px; font-size: 13px; cursor: pointer; text-decoration: none; transition: border-color .15s; }
   button:hover, .lswitch:hover { border-color: #e8b339; }
+  .lswitch.try { border-color: #6a5a35; color: #ffd76a; }
   .tip { font-size: 12px; color: #565b64; margin-top: 6px; }
   footer { margin-top: 38px; font-size: 12px; color: #565b64; text-align: center; line-height: 1.9; }
   footer .big { font-size: 14px; color: #9aa0aa; }
@@ -76,15 +77,15 @@
 <div class="wrap">
   <div class="bar">
     <h1>🏆 My Vibecoding Achievements<span class="sub">35 / 37 unlocked</span></h1>
-    <div class="actions"><a class="lswitch" href="index.html">中</a><button id="copyBtn" onclick="copyStats()">Copy stats</button><button onclick="exportPng()">Export PNG</button><button onclick="toggleShare()">Share mode</button></div>
+    <div class="actions"><a class="lswitch try" href="try.html">🧮 Try yours</a><a class="lswitch" href="index.html">中</a><button id="copyBtn" onclick="copyStats()">Copy stats</button><button onclick="exportPng()">Export PNG</button><button onclick="toggleShare()">Share mode</button></div>
   </div>
   <div class="stats">
     <div class="st"><b>2026-03-11</b><span>Joined</span></div>
     <div class="st"><b>1289</b><span>Sessions</span></div>
     <div class="st"><b>90</b><span>Active days</span></div>
-    <div class="st"><b>14.2B</b><span>Total tokens (incl. cache)</span></div>
-    <div class="st hideShare"><b>102.4M</b><span>Output tokens</span></div>
-    <div class="st hideShare"><b>68562</b><span>Tool calls</span></div>
+    <div class="st"><b>14.3B</b><span>Total tokens (incl. cache)</span></div>
+    <div class="st hideShare"><b>102.6M</b><span>Output tokens</span></div>
+    <div class="st hideShare"><b>68622</b><span>Tool calls</span></div>
     <div class="st hideShare"><b>38</b><span>Late nights</span></div>
   </div>
   <div class="srcs">🧩 <b>3</b> platforms connected: <b>Claude Code</b> 586 sessions · <b>Codex</b> 10 sessions · <b>OpenClaw</b> 693 sessions</div>
@@ -124,7 +125,7 @@
     <div class="meta">
       <div class="nm">Gear Head<span class="tier">Silver</span></div>
       <div class="ds">500 MCP tool calls; more tools than tasks</div>
-      <div class="vl">3489 MCP calls</div>
+      <div class="vl">3522 MCP calls</div>
     </div></div>
 <div class="card ok" style="--tc:#b08d57" onclick="pick(this)">
     <div class="plaque"><span class="ic">🖼️</span></div>
@@ -312,7 +313,7 @@
     <div class="meta">
       <div class="nm">Ship Machine<span class="tier">Gold</span></div>
       <div class="ds">100 commits, with messages written better than yours</div>
-      <div class="vl">200 commits</div>
+      <div class="vl">203 commits</div>
     </div></div>
 <div class="card ok" style="--tc:#9fb4c7" onclick="pick(this)">
     <div class="plaque"><span class="ic">💥</span></div>
@@ -364,7 +365,7 @@ const SHARE_SUB = "35 / 37 unlocked";
 const SHARE_HEAD = "🏆 My Vibecoding Achievements — 35 / 37 unlocked (straight from local logs)";
 const MORE_TXT = "…and {n} more";
 const COPIED_TXT = "✅ Copied";
-const STATS4 = [{"v":"2026-03-11","l":"Joined"},{"v":"1289","l":"Sessions"},{"v":"90","l":"Active days"},{"v":"14.2B","l":"Total tokens (incl. cache)"}];
+const STATS4 = [{"v":"2026-03-11","l":"Joined"},{"v":"1289","l":"Sessions"},{"v":"90","l":"Active days"},{"v":"14.3B","l":"Total tokens (incl. cache)"}];
 const SEP = ": ";
 const REPO_URL = 'github.com/maxi-max-dev/vibe-trophy';
 function pick(el) {

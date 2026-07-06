@@ -337,7 +337,7 @@ const UI = {
     tiers: { '铜': '铜', '银': '银', '金': '金', '白金': '白金' },
     foot1: '数据全部来自本地真实日志，一条没编。',
     foot2: (n, names) => `已接入 ${n} 平台（${names}）· 本地离线生成 · 数据不出这台电脑`,
-    exportBtn: '导出图片', copyBtn: '复制战绩', copied: '✅ 已复制', shareHeader: '我的 vibecoding 成就', moreTxt: n => `…还有 ${n} 项`, fromLogs: '数据来自本地真实日志',
+    exportBtn: '导出图片', copyBtn: '复制战绩', copied: '✅ 已复制', shareHeader: '我的 vibecoding 成就', moreTxt: n => `…还有 ${n} 项`, fromLogs: '数据来自本地真实日志', tryBtn: '🧮 算算你的',
   },
   en: {
     lang: 'en', title: 'My Vibecoding Achievements', doc: 'My Vibecoding Achievements',
@@ -350,7 +350,7 @@ const UI = {
     tiers: { '铜': 'Bronze', '银': 'Silver', '金': 'Gold', '白金': 'Platinum' },
     foot1: 'Every number comes from local logs. Nothing made up.',
     foot2: (n, names) => `${n} platforms connected (${names}) · generated offline · your data never leaves this machine`,
-    exportBtn: 'Export PNG', copyBtn: 'Copy stats', copied: '✅ Copied', shareHeader: 'My Vibecoding Achievements', moreTxt: n => `…and ${n} more`, fromLogs: 'straight from local logs',
+    exportBtn: 'Export PNG', copyBtn: 'Copy stats', copied: '✅ Copied', shareHeader: 'My Vibecoding Achievements', moreTxt: n => `…and ${n} more`, fromLogs: 'straight from local logs', tryBtn: '🧮 Try yours',
   },
 };
 
@@ -438,6 +438,7 @@ function render(L) {
   .pgb { height: 100%; background: linear-gradient(90deg, #7a6a45, #ffd76a); border-radius: 4px; }
   button, .lswitch { background: #1d2027; color: #e8e6e3; border: 1px solid #2f3440; border-radius: 9px; padding: 8px 14px; font-size: 13px; cursor: pointer; text-decoration: none; transition: border-color .15s; }
   button:hover, .lswitch:hover { border-color: #e8b339; }
+  .lswitch.try { border-color: #6a5a35; color: #ffd76a; }
   .tip { font-size: 12px; color: #565b64; margin-top: 6px; }
   footer { margin-top: 38px; font-size: 12px; color: #565b64; text-align: center; line-height: 1.9; }
   footer .big { font-size: 14px; color: #9aa0aa; }
@@ -463,7 +464,7 @@ function render(L) {
 <div class="wrap">
   <div class="bar">
     <h1>🏆 ${L.title}<span class="sub">${L.unlockedTxt(unlocked.length, A.length)}</span></h1>
-    <div class="actions"><a class="lswitch" href="${L.switchHref}">${L.switchTxt}</a><button id="copyBtn" onclick="copyStats()">${L.copyBtn}</button><button onclick="exportPng()">${L.exportBtn}</button><button onclick="toggleShare()">${L.share}</button></div>
+    <div class="actions"><a class="lswitch try" href="try.html">${L.tryBtn}</a><a class="lswitch" href="${L.switchHref}">${L.switchTxt}</a><button id="copyBtn" onclick="copyStats()">${L.copyBtn}</button><button onclick="exportPng()">${L.exportBtn}</button><button onclick="toggleShare()">${L.share}</button></div>
   </div>
   <div class="stats">
 ${sv.map((v, i) => `    <div class="st${i >= 4 ? ' hideShare' : ''}"><b>${v}</b><span>${L.stats[i]}</span></div>`).join('\n')}

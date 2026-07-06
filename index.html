@@ -51,6 +51,7 @@
   .pgb { height: 100%; background: linear-gradient(90deg, #7a6a45, #ffd76a); border-radius: 4px; }
   button, .lswitch { background: #1d2027; color: #e8e6e3; border: 1px solid #2f3440; border-radius: 9px; padding: 8px 14px; font-size: 13px; cursor: pointer; text-decoration: none; transition: border-color .15s; }
   button:hover, .lswitch:hover { border-color: #e8b339; }
+  .lswitch.try { border-color: #6a5a35; color: #ffd76a; }
   .tip { font-size: 12px; color: #565b64; margin-top: 6px; }
   footer { margin-top: 38px; font-size: 12px; color: #565b64; text-align: center; line-height: 1.9; }
   footer .big { font-size: 14px; color: #9aa0aa; }
@@ -76,15 +77,15 @@
 <div class="wrap">
   <div class="bar">
     <h1>🏆 我的 vibecoding 成就<span class="sub">解锁 35 / 37</span></h1>
-    <div class="actions"><a class="lswitch" href="en.html">EN</a><button id="copyBtn" onclick="copyStats()">复制战绩</button><button onclick="exportPng()">导出图片</button><button onclick="toggleShare()">晒图模式</button></div>
+    <div class="actions"><a class="lswitch try" href="try.html">🧮 算算你的</a><a class="lswitch" href="en.html">EN</a><button id="copyBtn" onclick="copyStats()">复制战绩</button><button onclick="exportPng()">导出图片</button><button onclick="toggleShare()">晒图模式</button></div>
   </div>
   <div class="stats">
     <div class="st"><b>2026-03-11</b><span>入坑日</span></div>
     <div class="st"><b>1289</b><span>会话</span></div>
     <div class="st"><b>90</b><span>活跃天</span></div>
-    <div class="st"><b>142.3 亿</b><span>累计 token（含缓存）</span></div>
+    <div class="st"><b>142.8 亿</b><span>累计 token（含缓存）</span></div>
     <div class="st hideShare"><b>1.0 亿</b><span>输出 token</span></div>
-    <div class="st hideShare"><b>68562</b><span>工具调用</span></div>
+    <div class="st hideShare"><b>68622</b><span>工具调用</span></div>
     <div class="st hideShare"><b>38</b><span>深夜场</span></div>
   </div>
   <div class="srcs">🧩 已接入 <b>3</b> 个平台：<b>Claude Code</b> 586 场 · <b>Codex</b> 10 场 · <b>OpenClaw</b> 693 场</div>
@@ -124,7 +125,7 @@
     <div class="meta">
       <div class="nm">装备党<span class="tier">银</span></div>
       <div class="ds">MCP 工具调用 500 次，工具比活儿多</div>
-      <div class="vl">3489 次 MCP 调用</div>
+      <div class="vl">3522 次 MCP 调用</div>
     </div></div>
 <div class="card ok" style="--tc:#b08d57" onclick="pick(this)">
     <div class="plaque"><span class="ic">🖼️</span></div>
@@ -268,7 +269,7 @@
     <div class="meta">
       <div class="nm">缓存白嫖怪<span class="tier">金</span></div>
       <div class="ds">缓存命中累计 10 亿 token，省下的都是赚的</div>
-      <div class="vl">白嫖 121.0 亿</div>
+      <div class="vl">白嫖 121.5 亿</div>
     </div></div>
 <div class="card ok" style="--tc:#9fb4c7" onclick="pick(this)">
     <div class="plaque"><span class="ic">🚧</span></div>
@@ -312,7 +313,7 @@
     <div class="meta">
       <div class="nm">Ship 机器<span class="tier">金</span></div>
       <div class="ds">经手 100 个 commit，信息还都写得比你好</div>
-      <div class="vl">200 个 commit</div>
+      <div class="vl">203 个 commit</div>
     </div></div>
 <div class="card ok" style="--tc:#9fb4c7" onclick="pick(this)">
     <div class="plaque"><span class="ic">💥</span></div>
@@ -364,7 +365,7 @@ const SHARE_SUB = "解锁 35 / 37";
 const SHARE_HEAD = "🏆 我的 vibecoding 成就 解锁 35 / 37（数据来自本地真实日志）";
 const MORE_TXT = "…还有 {n} 项";
 const COPIED_TXT = "✅ 已复制";
-const STATS4 = [{"v":"2026-03-11","l":"入坑日"},{"v":"1289","l":"会话"},{"v":"90","l":"活跃天"},{"v":"142.3 亿","l":"累计 token（含缓存）"}];
+const STATS4 = [{"v":"2026-03-11","l":"入坑日"},{"v":"1289","l":"会话"},{"v":"90","l":"活跃天"},{"v":"142.8 亿","l":"累计 token（含缓存）"}];
 const SEP = "：";
 const REPO_URL = 'github.com/maxi-max-dev/vibe-trophy';
 function pick(el) {

@@ -19,6 +19,10 @@
 
 ## 用法
 
+**最快（什么都不装）**：打开 [网页版](https://maxi-max-dev.github.io/vibe-trophy/try.html)，把 `~/.claude` 文件夹拖进去，浏览器本地算完直接出墙（数据不上传，断网也能用）。
+
+**命令行**：
+
 ```bash
 npx github:maxi-max-dev/vibe-trophy
 ```
@@ -42,6 +46,8 @@ npx github:maxi-max-dev/vibe-trophy
 ## English (quick)
 
 Steam-style achievements for your vibe coding, computed **locally** from your own AI-coding logs (Claude Code / Codex / OpenClaw adapters so far; anything with local logs can get one). Zero dependencies, fully offline, nothing leaves your machine, and the page contains only aggregate numbers, never message text or file paths.
+
+Fastest way — no install: open the [web version](https://maxi-max-dev.github.io/vibe-trophy/try.html) and drop your `~/.claude` folder in; everything is computed inside your browser. Or via CLI:
 
 ```bash
 npx github:maxi-max-dev/vibe-trophy
