@@ -269,153 +269,203 @@ const hrs = ms => ms / 36e5;
 const h1 = h => `${Math.floor(h)} 小时 ${Math.round(h % 1 * 60)} 分`;
 const srcNames = srcOn.map(b => b.name).join(' + ');
 
-// ---------- 成就定义 ----------
+// ---------- 成就定义（中英双语）----------
+const yiEn = n => n >= 1e9 ? `${(n / 1e9).toFixed(1)}B` : n >= 1e6 ? `${(n / 1e6).toFixed(1)}M` : n >= 1e3 ? `${(n / 1e3).toFixed(1)}K` : `${n}`;
+const h1En = h => `${Math.floor(h)}h ${Math.round(h % 1 * 60)}m`;
+const joinDate = isFinite(S.firstTs) ? local(S.firstTs).date : '?';
+
 const A = [
-  // 🌱 日常
-  { g: '日常', icon: '👋', name: 'Hello World', tier: '铜', desc: '第一次打开 AI 编程工具，从此再没亲手写过代码', cur: S.sessions, max: 1, val: `入坑于 ${isFinite(S.firstTs) ? local(S.firstTs).date : '?'}` },
-  { g: '日常', icon: '🧩', name: '跨栈玩家', tier: '金', desc: '同时驯服 2 个以上 AI 编程平台，鸡蛋不放一个篮子', cur: srcOn.length, max: 2, val: `${srcOn.length} 个平台：${srcNames}` },
-  { g: '日常', icon: '🛸', name: '全栈指挥官', tier: '白金', hidden: true, desc: '3 个平台同时在册，你不是用户，你是舰队司令', cur: srcOn.length, max: 3, val: `舰队编制：${srcNames}` },
-  { g: '日常', icon: '🗺️', name: '项目海王', tier: '银', desc: '同时撩 10 个以上项目，每一个都说过"这是主线"', cur: S.projects.size, max: 10, val: `${S.projects.size} 个项目` },
-  { g: '日常', icon: '🧰', name: '装备党', tier: '银', desc: 'MCP 工具调用 500 次，工具比活儿多', cur: S.mcpCalls, max: 500, val: `${S.mcpCalls} 次 MCP 调用` },
-  { g: '日常', icon: '🖼️', name: '一图胜千言', tier: '铜', desc: '截图一甩："就照这个做"，累计 10 张', cur: S.images, max: 10, val: `甩过 ${S.images} 张图` },
-  { g: '日常', icon: '📚', name: '提示词小说家', tier: '银', desc: '单条消息 500 字起步，这不是 prompt 是需求文档', cur: S.longPrompts, max: 1, val: `最长一条 ${S.maxPromptLen} 字，超500字共 ${S.longPrompts} 条` },
-  { g: '日常', icon: '🤏', name: '一字千金', tier: '银', desc: '两个字以内的指令发了 20 条，"继续"就是最强 prompt', cur: S.tiny, max: 20, val: `${S.tiny} 条极简指令` },
-  { g: '日常', icon: '🔂', name: '复读机', tier: '铜', desc: '一字不差把同一句话再发一遍，共 5 次。再试一次，再试亿次', cur: S.repeats, max: 5, val: `${S.repeats} 次原句重发` },
-  { g: '日常', icon: '🧭', name: '导航员', tier: '铜', desc: '甩了 50 个链接过去："你自己去看"', cur: S.urls, max: 50, val: `${S.urls} 条带链接消息` },
-  { g: '日常', icon: '🪞', name: '元成就', tier: '铜', hidden: true, desc: '用一个成就系统，围观自己的成就', cur: 1, max: 1, val: '你正在看它' },
-  // 🌙 肝度
-  { g: '肝度', icon: '🌙', name: '凌晨三点俱乐部', tier: '银', desc: '02:00–06:00 还在 vibe，全世界只剩你和它的 loading', cur: S.nightDays.size, max: 1, val: `${S.nightDays.size} 个深夜` },
-  { g: '肝度', icon: '🧛', name: '吸血鬼作息', tier: '金', desc: '连续 3 天深夜营业，太阳升起前必须收工', cur: vampStreak, max: 3, val: `连续 ${vampStreak} 天深夜在线` },
-  { g: '肝度', icon: '🌅', name: '日出见证者', tier: '金', hidden: true, desc: '清晨五点还在线。没人知道你是没睡，还是刚醒', cur: S.dawnDays.size, max: 1, val: `${S.dawnDays.size} 次日出` },
-  { g: '肝度', icon: '📅', name: '七天连勤', tier: '银', desc: '连续 7 天有会话。休息？那是模型维护日干的事', cur: bestStreak, max: 7, val: `最长连勤 ${bestStreak} 天` },
-  { g: '肝度', icon: '🏃', name: '马拉松选手', tier: '金', desc: '一口气连续会话 6 小时，断档半小时算休息', cur: +hrs(S.longestRun).toFixed(1), max: 6, val: `最长 ${h1(hrs(S.longestRun))}`, hint: '坐下，别起来' },
-  { g: '肝度', icon: '🧘', name: '全天候 Vibe', tier: '白金', desc: '睁眼第一件事和闭眼最后一件事是同一件事，单日跨度 16 小时', cur: +maxDaySpanH.toFixed(1), max: 16, val: `单日跨度 ${maxDaySpanH.toFixed(1)} 小时` },
-  { g: '肝度', icon: '🗓️', name: '日理万机', tier: '金', desc: '单日开 15 场会话，每个窗口都在"快好了"', cur: maxDayS, max: 15, val: `单日最多 ${maxDayS} 场` },
-  { g: '肝度', icon: '🎪', name: '多线程人格', tier: '金', desc: '同一小时 3 路会话并行：左手报错，右手"你说得对"', cur: maxPara, max: 3, val: `最高并行 ${maxPara} 路` },
-  { g: '肝度', icon: '🔁', name: '我又回来了', tier: '铜', hidden: true, desc: '戒了 7 天，还是回来了', cur: comeback ? 1 : 0, max: 1, val: '欢迎回家' },
-  { g: '肝度', icon: '🍜', name: '饭点不存在', tier: '银', desc: '午饭点和晚饭点都在线，共 10 天。干饭不如干活', cur: mealBoth, max: 10, val: `${mealBoth} 天午晚连线` },
-  { g: '肝度', icon: '🌤️', name: '周末战士', tier: '铜', desc: '周六周日也在线 10 天，双休是不存在的', cur: wknd, max: 10, val: `周末上线 ${wknd} 天` },
-  // 💸 钞能力
-  { g: '钞能力', icon: '🔥', name: '烧 token 大户', tier: '金', desc: '单次会话烧掉 5000 万 token，电表都没你转得快', cur: S.maxSessionTokens, max: 5e7, val: `单会话纪录 ${yi(S.maxSessionTokens)}`, fmt: yi },
-  { g: '钞能力', icon: '💯', name: '亿级玩家', tier: '白金', hidden: true, desc: '单会话破 1 亿 token。致敬传说中 1.2 亿的那位', cur: S.maxSessionTokens, max: 1e8, val: `单会话纪录 ${yi(S.maxSessionTokens)}`, fmt: yi },
-  { g: '钞能力', icon: '🐷', name: '缓存白嫖怪', tier: '金', desc: '缓存命中累计 10 亿 token，省下的都是赚的', cur: S.tokens.cr, max: 1e9, val: `白嫖 ${yi(S.tokens.cr)}`, fmt: yi },
-  { g: '钞能力', icon: '🚧', name: '额度撞墙', tier: '银', hidden: true, desc: '撞过用量上限还回来继续，墙都不服就服你', cur: S.limitHit ? 1 : 0, max: 1, val: '这面墙记住你了' },
-  // 🎮 微操
-  { g: '微操', icon: '🏗️', name: '包工头', tier: '金', desc: '派出 100 个子代理，精通自己不干活的艺术', cur: S.taskCalls, max: 100, val: `已派 ${S.taskCalls} 个分身` },
-  { g: '微操', icon: '🧨', name: '一句话工程', tier: '金', desc: '一条指令，AI 连打 50 个工具调用不带喘', cur: S.maxBurst, max: 50, val: `最长连击 ${S.maxBurst}` },
-  { g: '微操', icon: '🫡', name: '你说得对学派', tier: '银', desc: '被 AI 说过 50 次"你说得对"，而你确实说得对', cur: S.saidRight, max: 50, val: `${S.saidRight} 次` },
-  { g: '微操', icon: '🛑', name: '刹车侠', tier: '银', desc: '按 20 次 Esc 打断输出。刹车是最后的尊严', cur: S.interrupts, max: 20, val: `踩了 ${S.interrupts} 脚刹车` },
-  { g: '微操', icon: '🚢', name: 'Ship 机器', tier: '金', desc: '经手 100 个 commit，信息还都写得比你好', cur: S.gitCommits, max: 100, val: `${S.gitCommits} 个 commit` },
-  { g: '微操', icon: '💥', name: '上下文爆破手', tier: '银', desc: '把对话聊到失忆 10 次，compact 是一种境界', cur: S.compacts, max: 10, val: `${S.compacts} 次失忆` },
-  { g: '微操', icon: '🎰', name: '全家桶收集者', tier: '银', desc: '用过 3 种以上模型：有的干活，有的跑腿，有的背锅', cur: S.models.size, max: 3, val: `${S.models.size} 种模型` },
-  { g: '微操', icon: '🙋', name: '甲方本人', tier: '铜', desc: '被 AI 反过来追问 20 次需求，这就是话语权', cur: S.askCalls, max: 20, val: `被追问 ${S.askCalls} 次` },
-  { g: '微操', icon: '🙏', name: '人机礼仪模范', tier: '铜', desc: '对 AI 说了 20 次谢谢。它记不住，但你是好人', cur: S.thanks, max: 20, val: `${S.thanks} 次感谢` },
-  { g: '微操', icon: '🤬', name: '口吐芬芳', tier: '金', hidden: true, desc: '对 AI 爆了 10 次粗口。致敬 2012 年 Visual Studio 成就系统的 Potty Mouth', cur: S.swears, max: 10, val: `${S.swears} 次真情流露` },
-  { g: '微操', icon: '⏳', name: '已读不回', tier: '金', hidden: true, desc: 'AI 答完干等你 2 小时起步，共 5 次。它不困，你先睡', cur: S.waits, max: 5, val: `共 ${S.waits} 次，最长晾了 ${(S.maxWait / 36e5).toFixed(1)} 小时` },
+  // 🌱 日常 Daily
+  { g: '日常', icon: '👋', name: 'Hello World', nameEn: 'Hello World', tier: '铜', desc: '第一次打开 AI 编程工具，从此再没亲手写过代码', descEn: 'Opened an AI coding tool once; never hand-wrote code again', cur: S.sessions, max: 1, val: `入坑于 ${joinDate}`, valEn: `Joined ${joinDate}` },
+  { g: '日常', icon: '🧩', name: '跨栈玩家', nameEn: 'Cross-Stack Player', tier: '金', desc: '同时驯服 2 个以上 AI 编程平台，鸡蛋不放一个篮子', descEn: 'Taming 2+ AI coding platforms at once; eggs, many baskets', cur: srcOn.length, max: 2, val: `${srcOn.length} 个平台：${srcNames}`, valEn: `${srcOn.length} platforms: ${srcNames}` },
+  { g: '日常', icon: '🛸', name: '全栈指挥官', nameEn: 'Fleet Commander', tier: '白金', hidden: true, desc: '3 个平台同时在册，你不是用户，你是舰队司令', descEn: '3+ platforms enlisted. You are not a user, you are an admiral', cur: srcOn.length, max: 3, val: `舰队编制：${srcNames}`, valEn: `Fleet: ${srcNames}` },
+  { g: '日常', icon: '🗺️', name: '项目海王', nameEn: 'Repo Casanova', tier: '银', desc: '同时撩 10 个以上项目，每一个都说过"这是主线"', descEn: 'Juggling 10+ projects, each one sworn to be "the main one"', cur: S.projects.size, max: 10, val: `${S.projects.size} 个项目`, valEn: `${S.projects.size} project folders` },
+  { g: '日常', icon: '🧰', name: '装备党', nameEn: 'Gear Head', tier: '银', desc: 'MCP 工具调用 500 次，工具比活儿多', descEn: '500 MCP tool calls; more tools than tasks', cur: S.mcpCalls, max: 500, val: `${S.mcpCalls} 次 MCP 调用`, valEn: `${S.mcpCalls} MCP calls` },
+  { g: '日常', icon: '🖼️', name: '一图胜千言', nameEn: 'Screenshot Diplomat', tier: '铜', desc: '截图一甩："就照这个做"，累计 10 张', descEn: '"Just make it look like this" — 10 screenshots thrown', cur: S.images, max: 10, val: `甩过 ${S.images} 张图`, valEn: `${S.images} images thrown` },
+  { g: '日常', icon: '📚', name: '提示词小说家', nameEn: 'Prompt Novelist', tier: '银', desc: '单条消息 500 字起步，这不是 prompt 是需求文档', descEn: '500+ chars in one message; that is not a prompt, that is a spec', cur: S.longPrompts, max: 1, val: `最长一条 ${S.maxPromptLen} 字，超500字共 ${S.longPrompts} 条`, valEn: `Longest ${S.maxPromptLen} chars · ${S.longPrompts} over 500` },
+  { g: '日常', icon: '🤏', name: '一字千金', nameEn: 'Man of Few Words', tier: '银', desc: '两个字以内的指令发了 20 条，"继续"就是最强 prompt', descEn: '20 commands of two characters or less; "go" is the strongest prompt', cur: S.tiny, max: 20, val: `${S.tiny} 条极简指令`, valEn: `${S.tiny} micro-commands` },
+  { g: '日常', icon: '🔂', name: '复读机', nameEn: 'Broken Record', tier: '铜', desc: '一字不差把同一句话再发一遍，共 5 次。再试一次，再试亿次', descEn: 'Re-sent the exact same message, 5 times. Try again. Try a-gain', cur: S.repeats, max: 5, val: `${S.repeats} 次原句重发`, valEn: `${S.repeats} exact re-sends` },
+  { g: '日常', icon: '🧭', name: '导航员', nameEn: 'Link Dealer', tier: '铜', desc: '甩了 50 个链接过去："你自己去看"', descEn: 'Threw 50 URLs: "see for yourself"', cur: S.urls, max: 50, val: `${S.urls} 条带链接消息`, valEn: `${S.urls} messages with links` },
+  { g: '日常', icon: '🪞', name: '元成就', nameEn: 'Meta Achievement', tier: '铜', hidden: true, desc: '用一个成就系统，围观自己的成就', descEn: 'Using an achievement system to admire your achievements', cur: 1, max: 1, val: '你正在看它', valEn: "You're looking at it" },
+  // 🌙 肝度 Grind
+  { g: '肝度', icon: '🌙', name: '凌晨三点俱乐部', nameEn: '3 AM Club', tier: '银', desc: '02:00–06:00 还在 vibe，全世界只剩你和它的 loading', descEn: 'Vibing between 2 and 6 AM; the world is just you and a loading spinner', cur: S.nightDays.size, max: 1, val: `${S.nightDays.size} 个深夜`, valEn: `${S.nightDays.size} late nights` },
+  { g: '肝度', icon: '🧛', name: '吸血鬼作息', nameEn: 'Vampire Schedule', tier: '金', desc: '连续 3 天深夜营业，太阳升起前必须收工', descEn: '3 nights in a row; wrap up before sunrise', cur: vampStreak, max: 3, val: `连续 ${vampStreak} 天深夜在线`, valEn: `${vampStreak} consecutive late nights` },
+  { g: '肝度', icon: '🌅', name: '日出见证者', nameEn: 'Sunrise Witness', tier: '金', hidden: true, desc: '清晨五点还在线。没人知道你是没睡，还是刚醒', descEn: 'Online at 5 AM. Nobody knows if you stayed up or got up', cur: S.dawnDays.size, max: 1, val: `${S.dawnDays.size} 次日出`, valEn: `${S.dawnDays.size} sunrises` },
+  { g: '肝度', icon: '📅', name: '七天连勤', nameEn: 'Seven-Day Streak', tier: '银', desc: '连续 7 天有会话。休息？那是模型维护日干的事', descEn: 'Sessions 7 days straight. Rest is for model maintenance days', cur: bestStreak, max: 7, val: `最长连勤 ${bestStreak} 天`, valEn: `Longest streak ${bestStreak} days` },
+  { g: '肝度', icon: '🏃', name: '马拉松选手', nameEn: 'Marathon Runner', tier: '金', desc: '一口气连续会话 6 小时，断档半小时算休息', descEn: '6 hours in one sitting; a 30-minute gap counts as rest', cur: +hrs(S.longestRun).toFixed(1), max: 6, val: `最长 ${h1(hrs(S.longestRun))}`, valEn: `Longest ${h1En(hrs(S.longestRun))}`, hint: '坐下，别起来', hintEn: 'Sit down. Stay.' },
+  { g: '肝度', icon: '🧘', name: '全天候 Vibe', nameEn: 'Round-the-Clock Vibe', tier: '白金', desc: '睁眼第一件事和闭眼最后一件事是同一件事，单日跨度 16 小时', descEn: 'First and last thing of the day is the same thing: a 16-hour span', cur: +maxDaySpanH.toFixed(1), max: 16, val: `单日跨度 ${maxDaySpanH.toFixed(1)} 小时`, valEn: `${maxDaySpanH.toFixed(1)}h span in one day` },
+  { g: '肝度', icon: '🗓️', name: '日理万机', nameEn: 'Overbooked', tier: '金', desc: '单日开 15 场会话，每个窗口都在"快好了"', descEn: '15 sessions in one day, every window "almost done"', cur: maxDayS, max: 15, val: `单日最多 ${maxDayS} 场`, valEn: `Up to ${maxDayS} sessions a day` },
+  { g: '肝度', icon: '🎪', name: '多线程人格', nameEn: 'Multithreaded Personality', tier: '金', desc: '同一小时 3 路会话并行：左手报错，右手"你说得对"', descEn: '3 sessions in the same hour: errors on the left, "absolutely right" on the right', cur: maxPara, max: 3, val: `最高并行 ${maxPara} 路`, valEn: `${maxPara} sessions in parallel` },
+  { g: '肝度', icon: '🔁', name: '我又回来了', nameEn: 'Back Again', tier: '铜', hidden: true, desc: '戒了 7 天，还是回来了', descEn: 'Quit for 7 days. Came back anyway', cur: comeback ? 1 : 0, max: 1, val: '欢迎回家', valEn: 'Welcome home' },
+  { g: '肝度', icon: '🍜', name: '饭点不存在', nameEn: 'Meals Are Optional', tier: '银', desc: '午饭点和晚饭点都在线，共 10 天。干饭不如干活', descEn: 'Online at both lunch and dinner, 10 days', cur: mealBoth, max: 10, val: `${mealBoth} 天午晚连线`, valEn: `${mealBoth} days lunch + dinner online` },
+  { g: '肝度', icon: '🌤️', name: '周末战士', nameEn: 'Weekend Warrior', tier: '铜', desc: '周六周日也在线 10 天，双休是不存在的', descEn: 'Online on 10 weekend days; weekends are a myth', cur: wknd, max: 10, val: `周末上线 ${wknd} 天`, valEn: `${wknd} weekend days online` },
+  // 💸 钞能力 Cash Burn
+  { g: '钞能力', icon: '🔥', name: '烧 token 大户', nameEn: 'Token Furnace', tier: '金', desc: '单次会话烧掉 5000 万 token，电表都没你转得快', descEn: '50M+ tokens in one session; faster than your power meter', cur: S.maxSessionTokens, max: 5e7, val: `单会话纪录 ${yi(S.maxSessionTokens)}`, valEn: `Record ${yiEn(S.maxSessionTokens)} in one session`, fmt: yi, fmtEn: yiEn },
+  { g: '钞能力', icon: '💯', name: '亿级玩家', nameEn: 'Hundred-Million Club', tier: '白金', hidden: true, desc: '单会话破 1 亿 token。致敬传说中 1.2 亿的那位', descEn: '100M+ tokens in one session. Tribute to the legendary 120M guy', cur: S.maxSessionTokens, max: 1e8, val: `单会话纪录 ${yi(S.maxSessionTokens)}`, valEn: `Record ${yiEn(S.maxSessionTokens)} in one session`, fmt: yi, fmtEn: yiEn },
+  { g: '钞能力', icon: '🐷', name: '缓存白嫖怪', nameEn: 'Cache Freeloader', tier: '金', desc: '缓存命中累计 10 亿 token，省下的都是赚的', descEn: '1B+ cached tokens; every hit is free money', cur: S.tokens.cr, max: 1e9, val: `白嫖 ${yi(S.tokens.cr)}`, valEn: `${yiEn(S.tokens.cr)} freeloaded`, fmt: yi, fmtEn: yiEn },
+  { g: '钞能力', icon: '🚧', name: '额度撞墙', nameEn: 'Rate-Limit Survivor', tier: '银', hidden: true, desc: '撞过用量上限还回来继续，墙都不服就服你', descEn: 'Hit the usage wall and came back for more', cur: S.limitHit ? 1 : 0, max: 1, val: '这面墙记住你了', valEn: 'The wall remembers you' },
+  // 🎮 微操 Micro-ops
+  { g: '微操', icon: '🏗️', name: '包工头', nameEn: 'The Foreman', tier: '金', desc: '派出 100 个子代理，精通自己不干活的艺术', descEn: '100 subagents dispatched; the art of not doing the work yourself', cur: S.taskCalls, max: 100, val: `已派 ${S.taskCalls} 个分身`, valEn: `${S.taskCalls} clones dispatched` },
+  { g: '微操', icon: '🧨', name: '一句话工程', nameEn: 'One-Prompt Wonder', tier: '金', desc: '一条指令，AI 连打 50 个工具调用不带喘', descEn: 'One instruction, 50+ tool calls without catching a breath', cur: S.maxBurst, max: 50, val: `最长连击 ${S.maxBurst}`, valEn: `Longest combo ${S.maxBurst}` },
+  { g: '微操', icon: '🫡', name: '你说得对学派', nameEn: '"You\'re Absolutely Right"', tier: '银', desc: '被 AI 说过 50 次"你说得对"，而你确实说得对', descEn: 'Heard it 50 times. And you absolutely were', cur: S.saidRight, max: 50, val: `${S.saidRight} 次`, valEn: `${S.saidRight} times` },
+  { g: '微操', icon: '🛑', name: '刹车侠', nameEn: 'Emergency Brake', tier: '银', desc: '按 20 次 Esc 打断输出。刹车是最后的尊严', descEn: '20 Esc presses; the brake is your last dignity', cur: S.interrupts, max: 20, val: `踩了 ${S.interrupts} 脚刹车`, valEn: `${S.interrupts} brakes` },
+  { g: '微操', icon: '🚢', name: 'Ship 机器', nameEn: 'Ship Machine', tier: '金', desc: '经手 100 个 commit，信息还都写得比你好', descEn: '100 commits, with messages written better than yours', cur: S.gitCommits, max: 100, val: `${S.gitCommits} 个 commit`, valEn: `${S.gitCommits} commits` },
+  { g: '微操', icon: '💥', name: '上下文爆破手', nameEn: 'Context Bomber', tier: '银', desc: '把对话聊到失忆 10 次，compact 是一种境界', descEn: 'Talked the AI into amnesia 10 times; compaction is a lifestyle', cur: S.compacts, max: 10, val: `${S.compacts} 次失忆`, valEn: `${S.compacts} blackouts` },
+  { g: '微操', icon: '🎰', name: '全家桶收集者', nameEn: 'Model Collector', tier: '银', desc: '用过 3 种以上模型：有的干活，有的跑腿，有的背锅', descEn: '3+ models: one works, one runs errands, one takes the blame', cur: S.models.size, max: 3, val: `${S.models.size} 种模型`, valEn: `${S.models.size} models` },
+  { g: '微操', icon: '🙋', name: '甲方本人', nameEn: 'The Client', tier: '铜', desc: '被 AI 反过来追问 20 次需求，这就是话语权', descEn: 'The AI asked YOU for requirements 20 times; that is leverage', cur: S.askCalls, max: 20, val: `被追问 ${S.askCalls} 次`, valEn: `Asked ${S.askCalls} times` },
+  { g: '微操', icon: '🙏', name: '人机礼仪模范', nameEn: 'Politeness Award', tier: '铜', desc: '对 AI 说了 20 次谢谢。它记不住，但你是好人', descEn: 'Said thanks 20 times. It will not remember, but you are a good person', cur: S.thanks, max: 20, val: `${S.thanks} 次感谢`, valEn: `${S.thanks} thanks` },
+  { g: '微操', icon: '🤬', name: '口吐芬芳', nameEn: 'Potty Mouth', tier: '金', hidden: true, desc: '对 AI 爆了 10 次粗口。致敬 2012 年 Visual Studio 成就系统的 Potty Mouth', descEn: 'Swore at the AI 10 times. A tribute to Visual Studio Achievements (2012)', cur: S.swears, max: 10, val: `${S.swears} 次真情流露`, valEn: `${S.swears} heartfelt outbursts` },
+  { g: '微操', icon: '⏳', name: '已读不回', nameEn: 'Left on Read', tier: '金', hidden: true, desc: 'AI 答完干等你 2 小时起步，共 5 次。它不困，你先睡', descEn: 'The AI answered, you vanished for 2+ hours, 5 times. It is not tired; you sleep first', cur: S.waits, max: 5, val: `共 ${S.waits} 次，最长晾了 ${(S.maxWait / 36e5).toFixed(1)} 小时`, valEn: `${S.waits} times · longest ${(S.maxWait / 36e5).toFixed(1)}h ghost` },
 ];
 for (const a of A) a.ok = a.cur >= a.max;
 const unlocked = A.filter(a => a.ok);
 
-// ---------- HTML ----------
+// ---------- 渲染（双语）----------
 const TIER_COLOR = { '铜': '#b08d57', '银': '#9fb4c7', '金': '#e8b339', '白金': '#7fd4d0' };
 const GROUPS = ['日常', '肝度', '钞能力', '微操'];
 const esc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;');
+const UI = {
+  zh: {
+    lang: 'zh', title: '我的 vibecoding 成就', doc: '我的 vibecoding 成就',
+    unlockedTxt: (u, t) => `解锁 ${u} / ${t}`, share: '晒图模式', switchHref: 'en.html', switchTxt: 'EN',
+    stats: ['入坑日', '会话', '活跃天', '累计 token（含缓存）', '输出 token', '工具调用', '深夜场'],
+    srcsLine: (n, parts) => `🧩 已接入 <b>${n}</b> 个平台：${parts}`, sess: '场',
+    tip: '点卡片选中「晒」标记，晒图模式只显示选中的；不选则默认晒金/白金。',
+    hiddenName: '隐藏成就', hiddenDesc: '继续 vibe，总会撞见的', lockedTxt: '未解锁', hiddenTag: '隐藏',
+    groups: { '日常': '🌱 日常', '肝度': '🌙 肝度', '钞能力': '💸 钞能力', '微操': '🎮 微操' },
+    tiers: { '铜': '铜', '银': '银', '金': '金', '白金': '白金' },
+    foot1: '数据全部来自本地真实日志，一条没编。',
+    foot2: (n, names) => `已接入 ${n} 平台（${names}）· 本地离线生成 · 数据不出这台电脑`,
+  },
+  en: {
+    lang: 'en', title: 'My Vibecoding Achievements', doc: 'My Vibecoding Achievements',
+    unlockedTxt: (u, t) => `${u} / ${t} unlocked`, share: 'Share mode', switchHref: 'index.html', switchTxt: '中',
+    stats: ['Joined', 'Sessions', 'Active days', 'Total tokens (incl. cache)', 'Output tokens', 'Tool calls', 'Late nights'],
+    srcsLine: (n, parts) => `🧩 <b>${n}</b> platforms connected: ${parts}`, sess: 'sessions',
+    tip: 'Click cards to mark them for sharing; share mode shows only marked cards (default: gold & platinum).',
+    hiddenName: 'Hidden achievement', hiddenDesc: 'Keep vibing, you will bump into it', lockedTxt: 'Locked', hiddenTag: 'hidden',
+    groups: { '日常': '🌱 Daily', '肝度': '🌙 Grind', '钞能力': '💸 Cash Burn', '微操': '🎮 Micro-ops' },
+    tiers: { '铜': 'Bronze', '银': 'Silver', '金': 'Gold', '白金': 'Platinum' },
+    foot1: 'Every number comes from local logs. Nothing made up.',
+    foot2: (n, names) => `${n} platforms connected (${names}) · generated offline · your data never leaves this machine`,
+  },
+};
 
-function card(a) {
-  const lock = !a.ok;
-  if (lock && a.hidden) return `<div class="card locked hid"><div class="ic">❓</div><div class="meta"><div class="nm">隐藏成就</div><div class="ds">继续 vibe，总会撞见的</div></div></div>`;
-  const f = a.fmt || (x => x);
-  const pct = Math.min(100, Math.round(a.cur / a.max * 100));
-  const prog = lock && a.max > 1
-    ? `<div class="pg"><div class="pgb" style="width:${pct}%"></div></div><div class="vl">${f(a.cur)} / ${f(a.max)}${a.hint ? ` · ${esc(a.hint)}` : ''}</div>`
-    : `<div class="vl">${lock ? esc(a.hint || '未解锁') : esc(a.val)}</div>`;
-  return `<div class="card ${lock ? 'locked' : 'ok'}${a.tier === '白金' ? ' plat' : ''}" style="--tc:${TIER_COLOR[a.tier]}" onclick="pick(this)">
-    <div class="ic">${lock ? '🔒' : a.icon}</div>
+function render(L) {
+  const T = t => L.tiers[t];
+  const pick = (a, zh, en) => L.lang === 'en' ? (a[en] ?? a[zh]) : a[zh];
+  const card = a => {
+    const lock = !a.ok;
+    if (lock && a.hidden) return `<div class="card locked hid"><div class="plaque"><span class="ic">❓</span></div><div class="meta"><div class="nm">${L.hiddenName}</div><div class="ds">${L.hiddenDesc}</div></div></div>`;
+    const f = (L.lang === 'en' ? a.fmtEn : a.fmt) || (x => x);
+    const pct = Math.min(100, Math.round(a.cur / a.max * 100));
+    const hint = pick(a, 'hint', 'hintEn');
+    const prog = lock && a.max > 1
+      ? `<div class="pg"><div class="pgb" style="width:${pct}%"></div></div><div class="vl">${f(a.cur)} / ${f(a.max)}${hint ? ` · ${esc(hint)}` : ''}</div>`
+      : `<div class="vl">${lock ? esc(hint || L.lockedTxt) : esc(pick(a, 'val', 'valEn'))}</div>`;
+    return `<div class="card ${lock ? 'locked' : 'ok'}${a.tier === '白金' ? ' plat' : ''}" style="--tc:${TIER_COLOR[a.tier]}" onclick="pick(this)">
+    <div class="plaque"><span class="ic">${lock ? '🔒' : a.icon}</span></div>
     <div class="meta">
-      <div class="nm">${esc(a.name)}<span class="tier">${a.tier}</span>${a.hidden ? '<span class="tier hdt">隐藏</span>' : ''}</div>
-      <div class="ds">${esc(a.desc)}</div>
+      <div class="nm">${esc(pick(a, 'name', 'nameEn'))}<span class="tier">${T(a.tier)}</span>${a.hidden ? `<span class="tier hdt">${L.hiddenTag}</span>` : ''}</div>
+      <div class="ds">${esc(pick(a, 'desc', 'descEn'))}</div>
       ${prog}
     </div></div>`;
-}
-const sections = GROUPS.map(g => `
-  <h2>${{ '日常': '🌱', '肝度': '🌙', '钞能力': '💸', '微操': '🎮' }[g]} ${g}<span class="gs">${A.filter(a => a.g === g && a.ok).length}/${A.filter(a => a.g === g).length}</span></h2>
+  };
+  const sections = GROUPS.map(g => `
+  <h2><span>${L.groups[g]}</span><span class="gs">${A.filter(a => a.g === g && a.ok).length}/${A.filter(a => a.g === g).length}</span><span class="rule"></span></h2>
   <div class="grid">${A.filter(a => a.g === g).map(card).join('\n')}</div>`).join('\n');
+  const statVals = [joinDate, S.sessions, S.days.size, yi(totalTokens), yi(S.tokens.out), S.toolCalls, S.nightDays.size];
+  const statValsEn = [joinDate, S.sessions, S.days.size, yiEn(totalTokens), yiEn(S.tokens.out), S.toolCalls, S.nightDays.size];
+  const sv = L.lang === 'en' ? statValsEn : statVals;
+  const srcParts = srcOn.map(b => `<b>${esc(b.name)}</b> ${b.sessions} ${L.sess}`).join(' · ');
 
-const html = `<!DOCTYPE html>
-<html lang="zh">
+  return `<!DOCTYPE html>
+<html lang="${L.lang}">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>我的 vibecoding 成就</title>
+<title>${L.doc}</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🏆</text></svg>">
 <style>
   :root { color-scheme: dark; }
   * { box-sizing: border-box; margin: 0; }
-  body { background: #14161b; color: #e8e6e3; font-family: -apple-system, "PingFang SC", "Noto Sans SC", sans-serif; padding: 28px 16px 60px; }
-  .wrap { max-width: 880px; margin: 0 auto; }
-  h1 { font-size: 26px; letter-spacing: 1px; }
-  h1 .sub { font-size: 13px; color: #8a8f98; font-weight: 400; margin-left: 10px; }
-  h2 { font-size: 16px; margin: 26px 0 10px; color: #c8ccd2; }
-  h2 .gs { font-size: 12px; color: #6b7280; margin-left: 8px; }
-  .stats { display: flex; flex-wrap: wrap; gap: 10px; margin: 18px 0 6px; }
-  .st { background: #1d2027; border: 1px solid #2a2e37; border-radius: 10px; padding: 10px 14px; }
-  .st b { display: block; font-size: 18px; color: #ffd76a; }
-  .st span { font-size: 12px; color: #8a8f98; }
-  .srcs { font-size: 12.5px; color: #8a8f98; margin: 8px 0 0; }
+  body {
+    background: #101216;
+    background-image: radial-gradient(900px 500px at 8% -10%, rgba(232,179,57,.07), transparent 60%),
+                      radial-gradient(800px 500px at 95% -5%, rgba(127,212,208,.05), transparent 55%);
+    color: #e8e6e3; font-family: -apple-system, "PingFang SC", "Noto Sans SC", sans-serif;
+    padding: 34px 16px 60px; line-height: 1.45;
+  }
+  .wrap { max-width: 900px; margin: 0 auto; }
+  h1 { font-size: 27px; letter-spacing: .5px; }
+  h1 .sub { font-size: 13px; color: #8a8f98; font-weight: 500; margin-left: 12px; background: #1d2027; border: 1px solid #2f3440; padding: 3px 10px; border-radius: 20px; vertical-align: 4px; }
+  h2 { display: flex; align-items: center; gap: 10px; font-size: 15px; margin: 30px 0 12px; color: #c8ccd2; letter-spacing: 1px; }
+  h2 .gs { font-size: 12px; color: #6b7280; font-weight: 500; }
+  h2 .rule { flex: 1; height: 1px; background: linear-gradient(90deg, #2a2e37, transparent); }
+  .bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; gap: 12px; flex-wrap: wrap; }
+  .actions { display: flex; gap: 8px; align-items: center; }
+  .stats { display: flex; flex-wrap: wrap; gap: 10px; margin: 16px 0 8px; }
+  .st { background: linear-gradient(160deg, #1d2027, #181b21); border: 1px solid #2a2e37; border-radius: 12px; padding: 10px 15px; min-width: 86px; }
+  .st b { display: block; font-size: 19px; color: #ffd76a; font-variant-numeric: tabular-nums; }
+  .st span { font-size: 11.5px; color: #8a8f98; }
+  .srcs { font-size: 12.5px; color: #8a8f98; margin: 6px 0 0; }
   .srcs b { color: #c8ccd2; font-weight: 600; }
-  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(390px, 100%), 1fr)); gap: 12px; }
-  .card { display: flex; gap: 14px; align-items: center; background: linear-gradient(135deg, #1d2027, #191c22); border: 1px solid #2a2e37; border-left: 4px solid var(--tc, #2a2e37); border-radius: 12px; padding: 13px 16px; cursor: pointer; position: relative; }
-  .card.ok { box-shadow: 0 0 18px -8px var(--tc); }
-  .card.plat.ok { background: linear-gradient(135deg, #1d2a2a, #191c22); }
-  .card.locked { opacity: .45; filter: grayscale(.6); }
-  .card.pick::after { content: "晒"; position: absolute; top: -8px; right: -6px; background: #e8b339; color: #14161b; font-size: 11px; font-weight: 700; padding: 2px 7px; border-radius: 10px; }
-  .ic { font-size: 32px; width: 46px; text-align: center; flex-shrink: 0; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(400px, 100%), 1fr)); gap: 12px; }
+  .card { display: flex; gap: 14px; align-items: center; background: linear-gradient(135deg, #1c1f26, #171a20); border: 1px solid #262b34; border-radius: 14px; padding: 13px 15px; cursor: pointer; position: relative; transition: transform .15s ease, box-shadow .15s ease; }
+  .card.ok { border-color: color-mix(in srgb, var(--tc) 45%, #262b34); box-shadow: 0 0 22px -10px var(--tc), inset 0 1px 0 rgba(255,255,255,.03); }
+  .card.ok:hover { transform: translateY(-2px); box-shadow: 0 6px 26px -10px var(--tc); }
+  .card.plat.ok { background: linear-gradient(135deg, #1a2626, #171a20); animation: platGlow 3.2s ease-in-out infinite; }
+  @keyframes platGlow { 0%,100% { box-shadow: 0 0 18px -10px var(--tc); } 50% { box-shadow: 0 0 30px -8px var(--tc); } }
+  .card.locked { opacity: .42; filter: grayscale(.65); }
+  .card.pick::after { content: "晒"; position: absolute; top: -8px; right: -6px; background: #e8b339; color: #14161b; font-size: 11px; font-weight: 700; padding: 2px 7px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,.4); }
+  html[lang=en] .card.pick::after { content: "★"; }
+  .plaque { width: 52px; height: 52px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; background: #14161b; border: 1.5px solid color-mix(in srgb, var(--tc, #3a3f4b) 60%, transparent); border-radius: 13px; box-shadow: inset 0 0 12px rgba(0,0,0,.5); }
+  .locked .plaque { border-color: #2a2e37; }
+  .ic { font-size: 27px; }
   .nm { font-weight: 700; font-size: 15px; }
-  .tier { font-size: 11px; margin-left: 8px; padding: 1px 8px; border: 1px solid var(--tc); color: var(--tc); border-radius: 20px; vertical-align: 2px; }
-  .hdt { border-color: #8458b3; color: #a78bda; }
+  .tier { font-size: 10.5px; margin-left: 8px; padding: 1.5px 8px; border-radius: 20px; vertical-align: 2px; color: var(--tc); background: color-mix(in srgb, var(--tc) 13%, transparent); border: 1px solid color-mix(in srgb, var(--tc) 45%, transparent); }
+  .hdt { color: #a78bda; background: rgba(132, 88, 179, .14); border-color: rgba(167, 139, 218, .4); }
   .ds { font-size: 12.5px; color: #9aa0aa; margin-top: 3px; }
-  .vl { font-size: 12.5px; color: #ffd76a; margin-top: 5px; }
+  .vl { font-size: 12.5px; color: #ffd76a; margin-top: 6px; font-variant-numeric: tabular-nums; }
   .locked .vl { color: #6b7280; }
-  .pg { height: 5px; background: #2a2e37; border-radius: 4px; margin-top: 8px; overflow: hidden; }
-  .pgb { height: 100%; background: linear-gradient(90deg, #6b7280, #ffd76a); border-radius: 4px; }
-  .bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; gap: 12px; flex-wrap: wrap; }
-  button { background: #2a2e37; color: #e8e6e3; border: 1px solid #3a3f4b; border-radius: 8px; padding: 8px 14px; font-size: 13px; cursor: pointer; }
-  .tip { font-size: 12px; color: #565b64; margin-top: 4px; }
-  footer { margin-top: 34px; font-size: 12px; color: #565b64; text-align: center; line-height: 1.8; }
-  body.share { padding-top: 40px; }
-  body.share .wrap { max-width: 620px; }
+  .pg { height: 6px; background: #262b34; border-radius: 4px; margin-top: 9px; overflow: hidden; }
+  .pgb { height: 100%; background: linear-gradient(90deg, #7a6a45, #ffd76a); border-radius: 4px; }
+  button, .lswitch { background: #1d2027; color: #e8e6e3; border: 1px solid #2f3440; border-radius: 9px; padding: 8px 14px; font-size: 13px; cursor: pointer; text-decoration: none; transition: border-color .15s; }
+  button:hover, .lswitch:hover { border-color: #e8b339; }
+  .tip { font-size: 12px; color: #565b64; margin-top: 6px; }
+  footer { margin-top: 38px; font-size: 12px; color: #565b64; text-align: center; line-height: 1.9; }
+  footer .big { font-size: 14px; color: #9aa0aa; }
+  footer .brand { color: #8a8f98; letter-spacing: .5px; }
+  footer .brand b { color: #ffd76a; }
+  /* 晒图模式 / share mode */
+  body.share { padding-top: 42px; }
+  body.share .wrap { max-width: 640px; border: 1px solid #262b34; border-radius: 22px; padding: 28px 22px 24px; background: linear-gradient(180deg, #14171c, #101216); }
   body.share h1 { text-align: center; }
   body.share .bar { flex-direction: column; gap: 12px; }
   body.share .stats { justify-content: center; }
-  body.share h2, body.share .tip, body.share .st.hideShare { display: none; }
+  body.share h2, body.share .tip, body.share .st.hideShare, body.share .lswitch { display: none; }
   body.share .srcs { text-align: center; }
-  body.share .grid { grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
+  body.share .grid { grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 12px; }
   body.share .card { padding: 11px 13px; cursor: default; }
   body.share .card .ds { display: none; }
   body.share .card.locked, body.share .card.noshare { display: none; }
   body.share .card.pick::after { display: none; }
-  body.share footer { margin-top: 22px; }
-  body.share footer .big { font-size: 14px; color: #9aa0aa; }
+  body.share footer { margin-top: 24px; }
 </style>
 </head>
 <body>
 <div class="wrap">
   <div class="bar">
-    <h1>🏆 我的 vibecoding 成就<span class="sub">解锁 ${unlocked.length} / ${A.length}</span></h1>
-    <button onclick="toggleShare()">晒图模式</button>
+    <h1>🏆 ${L.title}<span class="sub">${L.unlockedTxt(unlocked.length, A.length)}</span></h1>
+    <div class="actions"><a class="lswitch" href="${L.switchHref}">${L.switchTxt}</a><button onclick="toggleShare()">${L.share}</button></div>
   </div>
   <div class="stats">
-    <div class="st"><b>${isFinite(S.firstTs) ? local(S.firstTs).date : '?'}</b><span>入坑日</span></div>
-    <div class="st"><b>${S.sessions}</b><span>会话</span></div>
-    <div class="st"><b>${S.days.size}</b><span>活跃天</span></div>
-    <div class="st"><b>${yi(totalTokens)}</b><span>累计 token（含缓存）</span></div>
-    <div class="st hideShare"><b>${yi(S.tokens.out)}</b><span>输出 token</span></div>
-    <div class="st hideShare"><b>${S.toolCalls}</b><span>工具调用</span></div>
-    <div class="st hideShare"><b>${S.nightDays.size}</b><span>深夜场</span></div>
+${sv.map((v, i) => `    <div class="st${i >= 4 ? ' hideShare' : ''}"><b>${v}</b><span>${L.stats[i]}</span></div>`).join('\n')}
   </div>
-  <div class="srcs">🧩 已接入 <b>${srcOn.length}</b> 个平台：${srcOn.map(b => `<b>${esc(b.name)}</b> ${b.sessions} 场`).join(' · ')}</div>
-  <div class="tip">点卡片选中「晒」标记，晒图模式只显示选中的；不选则默认晒金/白金。</div>
+  <div class="srcs">${L.srcsLine(srcOn.length, srcParts)}</div>
+  <div class="tip">${L.tip}</div>
 ${sections}
-  <footer><span class="big">数据全部来自本地真实日志，一条没编。</span><br>已接入 ${srcOn.length} 平台（${esc(srcNames)}）· 本地离线生成 · 数据不出这台电脑 · vibe-trophy v0.5</footer>
+  <footer><span class="big">${L.foot1}</span><br>${L.foot2(srcOn.length, esc(srcNames))}<br><span class="brand">🏆 <b>vibe-trophy</b> · github.com/maxi-max-dev/vibe-trophy</span></footer>
 </div>
 <script>
 function pick(el) {
@@ -426,7 +476,8 @@ function toggleShare() {
   const b = document.body, cards = [...document.querySelectorAll('.card.ok')];
   if (!b.classList.contains('share')) {
     const picked = cards.filter(c => c.classList.contains('pick'));
-    const show = picked.length ? picked : cards.filter(c => /金/.test(c.querySelector('.tier').textContent));
+    const gold = ['#e8b339', '#7fd4d0'];
+    const show = picked.length ? picked : cards.filter(c => gold.includes(getComputedStyle(c).getPropertyValue('--tc').trim()));
     cards.forEach(c => c.classList.toggle('noshare', !show.includes(c)));
   }
   b.classList.toggle('share');
@@ -434,9 +485,13 @@ function toggleShare() {
 </script>
 </body>
 </html>`;
+}
 
-fs.writeFileSync(OUT, html);
+fs.writeFileSync(OUT, render(UI.zh));
+const OUT_EN = path.join(path.dirname(OUT), 'en.html');
+fs.writeFileSync(OUT_EN, render(UI.en));
 console.log(`✅ ${OUT}`);
+console.log(`✅ ${OUT_EN} (English)`);
 console.log(`平台: ${srcOn.map(b => `${b.name} ${b.sessions} 场/${yi(b.tokens)} token`).join(' · ')}`);
 console.log(`解锁 ${unlocked.length}/${A.length}`);
 for (const g of GROUPS) console.log(`  ${g}: ${A.filter(a => a.g === g).map(a => (a.ok ? a.icon : '🔒') + a.name).join(' ')}`);
