@@ -75,17 +75,17 @@
 <body>
 <div class="wrap">
   <div class="bar">
-    <h1>🏆 我的 vibecoding 成就<span class="sub">解锁 36 / 37</span></h1>
-    <div class="actions"><a class="lswitch" href="en.html">EN</a><button onclick="toggleShare()">晒图模式</button></div>
+    <h1>🏆 我的 vibecoding 成就<span class="sub">解锁 35 / 37</span></h1>
+    <div class="actions"><a class="lswitch" href="en.html">EN</a><button id="copyBtn" onclick="copyStats()">复制战绩</button><button onclick="exportPng()">导出图片</button><button onclick="toggleShare()">晒图模式</button></div>
   </div>
   <div class="stats">
     <div class="st"><b>2026-03-11</b><span>入坑日</span></div>
     <div class="st"><b>1289</b><span>会话</span></div>
-    <div class="st"><b>105</b><span>活跃天</span></div>
-    <div class="st"><b>141.9 亿</b><span>累计 token（含缓存）</span></div>
+    <div class="st"><b>90</b><span>活跃天</span></div>
+    <div class="st"><b>142.3 亿</b><span>累计 token（含缓存）</span></div>
     <div class="st hideShare"><b>1.0 亿</b><span>输出 token</span></div>
-    <div class="st hideShare"><b>68491</b><span>工具调用</span></div>
-    <div class="st hideShare"><b>54</b><span>深夜场</span></div>
+    <div class="st hideShare"><b>68562</b><span>工具调用</span></div>
+    <div class="st hideShare"><b>38</b><span>深夜场</span></div>
   </div>
   <div class="srcs">🧩 已接入 <b>3</b> 个平台：<b>Claude Code</b> 586 场 · <b>Codex</b> 10 场 · <b>OpenClaw</b> 693 场</div>
   <div class="tip">点卡片选中「晒」标记，晒图模式只显示选中的；不选则默认晒金/白金。</div>
@@ -124,7 +124,7 @@
     <div class="meta">
       <div class="nm">装备党<span class="tier">银</span></div>
       <div class="ds">MCP 工具调用 500 次，工具比活儿多</div>
-      <div class="vl">3481 次 MCP 调用</div>
+      <div class="vl">3489 次 MCP 调用</div>
     </div></div>
 <div class="card ok" style="--tc:#b08d57" onclick="pick(this)">
     <div class="plaque"><span class="ic">🖼️</span></div>
@@ -169,62 +169,62 @@
       <div class="vl">你正在看它</div>
     </div></div></div>
 
-  <h2><span>🌙 肝度</span><span class="gs">11/11</span><span class="rule"></span></h2>
+  <h2><span>🌙 肝度</span><span class="gs">10/11</span><span class="rule"></span></h2>
   <div class="grid"><div class="card ok" style="--tc:#9fb4c7" onclick="pick(this)">
     <div class="plaque"><span class="ic">🌙</span></div>
     <div class="meta">
       <div class="nm">凌晨三点俱乐部<span class="tier">银</span></div>
       <div class="ds">02:00–06:00 还在 vibe，全世界只剩你和它的 loading</div>
-      <div class="vl">54 个深夜</div>
+      <div class="vl">38 个深夜</div>
     </div></div>
 <div class="card ok" style="--tc:#e8b339" onclick="pick(this)">
     <div class="plaque"><span class="ic">🧛</span></div>
     <div class="meta">
       <div class="nm">吸血鬼作息<span class="tier">金</span></div>
       <div class="ds">连续 3 天深夜营业，太阳升起前必须收工</div>
-      <div class="vl">连续 27 天深夜在线</div>
+      <div class="vl">连续 18 天深夜在线</div>
     </div></div>
 <div class="card ok" style="--tc:#e8b339" onclick="pick(this)">
     <div class="plaque"><span class="ic">🌅</span></div>
     <div class="meta">
       <div class="nm">日出见证者<span class="tier">金</span><span class="tier hdt">隐藏</span></div>
       <div class="ds">清晨五点还在线。没人知道你是没睡，还是刚醒</div>
-      <div class="vl">38 次日出</div>
+      <div class="vl">29 次日出</div>
     </div></div>
 <div class="card ok" style="--tc:#9fb4c7" onclick="pick(this)">
     <div class="plaque"><span class="ic">📅</span></div>
     <div class="meta">
       <div class="nm">七天连勤<span class="tier">银</span></div>
       <div class="ds">连续 7 天有会话。休息？那是模型维护日干的事</div>
-      <div class="vl">最长连勤 87 天</div>
+      <div class="vl">最长连勤 34 天</div>
     </div></div>
-<div class="card ok" style="--tc:#e8b339" onclick="pick(this)">
-    <div class="plaque"><span class="ic">🏃</span></div>
+<div class="card locked" style="--tc:#e8b339" onclick="pick(this)">
+    <div class="plaque"><span class="ic">🔒</span></div>
     <div class="meta">
       <div class="nm">马拉松选手<span class="tier">金</span></div>
       <div class="ds">一口气连续会话 6 小时，断档半小时算休息</div>
-      <div class="vl">最长 46 小时 22 分</div>
+      <div class="pg"><div class="pgb" style="width:57%"></div></div><div class="vl">3.4 / 6 · 坐下，别起来</div>
     </div></div>
 <div class="card ok plat" style="--tc:#7fd4d0" onclick="pick(this)">
     <div class="plaque"><span class="ic">🧘</span></div>
     <div class="meta">
       <div class="nm">全天候 Vibe<span class="tier">白金</span></div>
       <div class="ds">睁眼第一件事和闭眼最后一件事是同一件事，单日跨度 16 小时</div>
-      <div class="vl">单日跨度 23.7 小时</div>
+      <div class="vl">单日跨度 23.6 小时</div>
     </div></div>
 <div class="card ok" style="--tc:#e8b339" onclick="pick(this)">
     <div class="plaque"><span class="ic">🗓️</span></div>
     <div class="meta">
       <div class="nm">日理万机<span class="tier">金</span></div>
       <div class="ds">单日开 15 场会话，每个窗口都在"快好了"</div>
-      <div class="vl">单日最多 54 场</div>
+      <div class="vl">单日最多 47 场</div>
     </div></div>
 <div class="card ok" style="--tc:#e8b339" onclick="pick(this)">
     <div class="plaque"><span class="ic">🎪</span></div>
     <div class="meta">
       <div class="nm">多线程人格<span class="tier">金</span></div>
       <div class="ds">同一小时 3 路会话并行：左手报错，右手"你说得对"</div>
-      <div class="vl">最高并行 18 路</div>
+      <div class="vl">最高并行 13 路</div>
     </div></div>
 <div class="card ok" style="--tc:#b08d57" onclick="pick(this)">
     <div class="plaque"><span class="ic">🔁</span></div>
@@ -238,14 +238,14 @@
     <div class="meta">
       <div class="nm">饭点不存在<span class="tier">银</span></div>
       <div class="ds">午饭点和晚饭点都在线，共 10 天。干饭不如干活</div>
-      <div class="vl">57 天午晚连线</div>
+      <div class="vl">48 天午晚连线</div>
     </div></div>
 <div class="card ok" style="--tc:#b08d57" onclick="pick(this)">
     <div class="plaque"><span class="ic">🌤️</span></div>
     <div class="meta">
       <div class="nm">周末战士<span class="tier">铜</span></div>
       <div class="ds">周六周日也在线 10 天，双休是不存在的</div>
-      <div class="vl">周末上线 29 天</div>
+      <div class="vl">周末上线 26 天</div>
     </div></div></div>
 
   <h2><span>💸 钞能力</span><span class="gs">4/4</span><span class="rule"></span></h2>
@@ -268,7 +268,7 @@
     <div class="meta">
       <div class="nm">缓存白嫖怪<span class="tier">金</span></div>
       <div class="ds">缓存命中累计 10 亿 token，省下的都是赚的</div>
-      <div class="vl">白嫖 120.6 亿</div>
+      <div class="vl">白嫖 121.0 亿</div>
     </div></div>
 <div class="card ok" style="--tc:#9fb4c7" onclick="pick(this)">
     <div class="plaque"><span class="ic">🚧</span></div>
@@ -312,7 +312,7 @@
     <div class="meta">
       <div class="nm">Ship 机器<span class="tier">金</span></div>
       <div class="ds">经手 100 个 commit，信息还都写得比你好</div>
-      <div class="vl">197 个 commit</div>
+      <div class="vl">200 个 commit</div>
     </div></div>
 <div class="card ok" style="--tc:#9fb4c7" onclick="pick(this)">
     <div class="plaque"><span class="ic">💥</span></div>
@@ -359,19 +359,88 @@
   <footer><span class="big">数据全部来自本地真实日志，一条没编。</span><br>已接入 3 平台（Claude Code + Codex + OpenClaw）· 本地离线生成 · 数据不出这台电脑<br><span class="brand">🏆 <b>vibe-trophy</b> · github.com/maxi-max-dev/vibe-trophy</span></footer>
 </div>
 <script>
+const SHARE_TITLE = "🏆 我的 vibecoding 成就";
+const SHARE_SUB = "解锁 35 / 37";
+const SHARE_HEAD = "🏆 我的 vibecoding 成就 解锁 35 / 37（数据来自本地真实日志）";
+const MORE_TXT = "…还有 {n} 项";
+const COPIED_TXT = "✅ 已复制";
+const STATS4 = [{"v":"2026-03-11","l":"入坑日"},{"v":"1289","l":"会话"},{"v":"90","l":"活跃天"},{"v":"142.3 亿","l":"累计 token（含缓存）"}];
+const SEP = "：";
+const REPO_URL = 'github.com/maxi-max-dev/vibe-trophy';
 function pick(el) {
   if (document.body.classList.contains('share') || el.classList.contains('locked')) return;
   el.classList.toggle('pick');
 }
+function shareSet(cap) {
+  const cards = [...document.querySelectorAll('.card.ok')];
+  const picked = cards.filter(c => c.classList.contains('pick'));
+  const tc = c => getComputedStyle(c).getPropertyValue('--tc').trim();
+  let set = picked.length ? picked
+    : [...cards.filter(c => tc(c) === '#7fd4d0'), ...cards.filter(c => tc(c) === '#e8b339')];
+  return cap ? set.slice(0, cap) : set;
+}
+function rowData(c) {
+  return {
+    icon: c.querySelector('.ic').textContent,
+    name: c.querySelector('.nm').childNodes[0].textContent,
+    tier: c.querySelector('.tier').textContent,
+    val: c.querySelector('.vl').textContent,
+    color: getComputedStyle(c).getPropertyValue('--tc').trim() || '#e8b339',
+  };
+}
 function toggleShare() {
   const b = document.body, cards = [...document.querySelectorAll('.card.ok')];
   if (!b.classList.contains('share')) {
-    const picked = cards.filter(c => c.classList.contains('pick'));
-    const gold = ['#e8b339', '#7fd4d0'];
-    const show = picked.length ? picked : cards.filter(c => gold.includes(getComputedStyle(c).getPropertyValue('--tc').trim()));
+    const show = shareSet(0);
     cards.forEach(c => c.classList.toggle('noshare', !show.includes(c)));
   }
   b.classList.toggle('share');
+}
+function rr(x, a, b, w, h, r) { x.beginPath(); x.moveTo(a + r, b); x.arcTo(a + w, b, a + w, b + h, r); x.arcTo(a + w, b + h, a, b + h, r); x.arcTo(a, b + h, a, b, r); x.arcTo(a, b, a + w, b, r); x.closePath(); }
+function exportPng() {
+  const all = shareSet(0), rows = all.slice(0, 8).map(rowData), extra = all.length - rows.length;
+  const W = 1080, Hh = 1350, F = '-apple-system, "PingFang SC", "Noto Sans SC", sans-serif';
+  const cv = document.createElement('canvas'); cv.width = W; cv.height = Hh;
+  const x = cv.getContext('2d');
+  x.fillStyle = '#101216'; x.fillRect(0, 0, W, Hh);
+  const g = x.createRadialGradient(180, -80, 0, 180, -80, 950);
+  g.addColorStop(0, 'rgba(232,179,57,0.10)'); g.addColorStop(1, 'rgba(0,0,0,0)');
+  x.fillStyle = g; x.fillRect(0, 0, W, Hh);
+  x.strokeStyle = '#2a2e37'; x.lineWidth = 2; rr(x, 26, 26, W - 52, Hh - 52, 30); x.stroke();
+  x.textBaseline = 'middle';
+  x.fillStyle = '#e8e6e3'; x.font = '700 50px ' + F; x.fillText(SHARE_TITLE, 72, 122);
+  x.fillStyle = '#8a8f98'; x.font = '400 27px ' + F; x.fillText(SHARE_SUB, 72, 180);
+  let sx = 72;
+  STATS4.forEach(s => {
+    x.fillStyle = '#ffd76a'; x.font = '700 40px ' + F; x.fillText(s.v, sx, 264);
+    const vw = x.measureText(s.v).width;
+    x.fillStyle = '#8a8f98'; x.font = '400 21px ' + F; x.fillText(s.l, sx, 304);
+    sx += Math.max(vw, x.measureText(s.l).width) + 52;
+  });
+  let y = 402;
+  rows.forEach(r => {
+    x.fillStyle = '#1c1f26'; rr(x, 72, y - 46, W - 144, 92, 18); x.fill();
+    x.strokeStyle = r.color; x.lineWidth = 1.5; rr(x, 72, y - 46, W - 144, 92, 18); x.stroke();
+    x.fillStyle = r.color; rr(x, 72, y - 46, 7, 92, 3); x.fill();
+    x.font = '40px ' + F; x.fillText(r.icon, 102, y + 2);
+    x.fillStyle = '#e8e6e3'; x.font = '700 31px ' + F; x.fillText(r.name, 172, y - 15);
+    const nw = x.measureText(r.name).width;
+    x.fillStyle = r.color; x.font = '400 21px ' + F; x.fillText(r.tier, 172 + nw + 16, y - 13);
+    x.fillStyle = '#ffd76a'; x.font = '400 25px ' + F; x.fillText(r.val, 172, y + 26);
+    y += 104;
+  });
+  if (extra > 0) { x.fillStyle = '#6b7280'; x.font = '400 25px ' + F; x.fillText(MORE_TXT.replace('{n}', extra), 84, y); }
+  x.fillStyle = '#8a8f98'; x.font = '400 23px ' + F; x.fillText('🏆 vibe-trophy · ' + REPO_URL, 72, Hh - 82);
+  cv.toBlob(b => { const a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = 'vibe-trophy.png'; a.click(); });
+}
+function copyStats() {
+  const lines = [SHARE_HEAD];
+  shareSet(6).map(rowData).forEach(r => lines.push(r.icon + ' ' + r.name + SEP + r.val));
+  lines.push('👉 https://' + REPO_URL);
+  navigator.clipboard.writeText(lines.join('\n')).then(() => {
+    const b = document.getElementById('copyBtn'), t = b.textContent;
+    b.textContent = COPIED_TXT; setTimeout(() => { b.textContent = t; }, 1500);
+  });
 }
 </script>
 </body>

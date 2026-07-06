@@ -75,17 +75,17 @@
 <body>
 <div class="wrap">
   <div class="bar">
-    <h1>🏆 My Vibecoding Achievements<span class="sub">36 / 37 unlocked</span></h1>
-    <div class="actions"><a class="lswitch" href="index.html">中</a><button onclick="toggleShare()">Share mode</button></div>
+    <h1>🏆 My Vibecoding Achievements<span class="sub">35 / 37 unlocked</span></h1>
+    <div class="actions"><a class="lswitch" href="index.html">中</a><button id="copyBtn" onclick="copyStats()">Copy stats</button><button onclick="exportPng()">Export PNG</button><button onclick="toggleShare()">Share mode</button></div>
   </div>
   <div class="stats">
     <div class="st"><b>2026-03-11</b><span>Joined</span></div>
     <div class="st"><b>1289</b><span>Sessions</span></div>
-    <div class="st"><b>105</b><span>Active days</span></div>
+    <div class="st"><b>90</b><span>Active days</span></div>
     <div class="st"><b>14.2B</b><span>Total tokens (incl. cache)</span></div>
-    <div class="st hideShare"><b>102.3M</b><span>Output tokens</span></div>
-    <div class="st hideShare"><b>68491</b><span>Tool calls</span></div>
-    <div class="st hideShare"><b>54</b><span>Late nights</span></div>
+    <div class="st hideShare"><b>102.4M</b><span>Output tokens</span></div>
+    <div class="st hideShare"><b>68562</b><span>Tool calls</span></div>
+    <div class="st hideShare"><b>38</b><span>Late nights</span></div>
   </div>
   <div class="srcs">🧩 <b>3</b> platforms connected: <b>Claude Code</b> 586 sessions · <b>Codex</b> 10 sessions · <b>OpenClaw</b> 693 sessions</div>
   <div class="tip">Click cards to mark them for sharing; share mode shows only marked cards (default: gold & platinum).</div>
@@ -124,7 +124,7 @@
     <div class="meta">
       <div class="nm">Gear Head<span class="tier">Silver</span></div>
       <div class="ds">500 MCP tool calls; more tools than tasks</div>
-      <div class="vl">3481 MCP calls</div>
+      <div class="vl">3489 MCP calls</div>
     </div></div>
 <div class="card ok" style="--tc:#b08d57" onclick="pick(this)">
     <div class="plaque"><span class="ic">🖼️</span></div>
@@ -169,62 +169,62 @@
       <div class="vl">You're looking at it</div>
     </div></div></div>
 
-  <h2><span>🌙 Grind</span><span class="gs">11/11</span><span class="rule"></span></h2>
+  <h2><span>🌙 Grind</span><span class="gs">10/11</span><span class="rule"></span></h2>
   <div class="grid"><div class="card ok" style="--tc:#9fb4c7" onclick="pick(this)">
     <div class="plaque"><span class="ic">🌙</span></div>
     <div class="meta">
       <div class="nm">3 AM Club<span class="tier">Silver</span></div>
       <div class="ds">Vibing between 2 and 6 AM; the world is just you and a loading spinner</div>
-      <div class="vl">54 late nights</div>
+      <div class="vl">38 late nights</div>
     </div></div>
 <div class="card ok" style="--tc:#e8b339" onclick="pick(this)">
     <div class="plaque"><span class="ic">🧛</span></div>
     <div class="meta">
       <div class="nm">Vampire Schedule<span class="tier">Gold</span></div>
       <div class="ds">3 nights in a row; wrap up before sunrise</div>
-      <div class="vl">27 consecutive late nights</div>
+      <div class="vl">18 consecutive late nights</div>
     </div></div>
 <div class="card ok" style="--tc:#e8b339" onclick="pick(this)">
     <div class="plaque"><span class="ic">🌅</span></div>
     <div class="meta">
       <div class="nm">Sunrise Witness<span class="tier">Gold</span><span class="tier hdt">hidden</span></div>
       <div class="ds">Online at 5 AM. Nobody knows if you stayed up or got up</div>
-      <div class="vl">38 sunrises</div>
+      <div class="vl">29 sunrises</div>
     </div></div>
 <div class="card ok" style="--tc:#9fb4c7" onclick="pick(this)">
     <div class="plaque"><span class="ic">📅</span></div>
     <div class="meta">
       <div class="nm">Seven-Day Streak<span class="tier">Silver</span></div>
       <div class="ds">Sessions 7 days straight. Rest is for model maintenance days</div>
-      <div class="vl">Longest streak 87 days</div>
+      <div class="vl">Longest streak 34 days</div>
     </div></div>
-<div class="card ok" style="--tc:#e8b339" onclick="pick(this)">
-    <div class="plaque"><span class="ic">🏃</span></div>
+<div class="card locked" style="--tc:#e8b339" onclick="pick(this)">
+    <div class="plaque"><span class="ic">🔒</span></div>
     <div class="meta">
       <div class="nm">Marathon Runner<span class="tier">Gold</span></div>
       <div class="ds">6 hours in one sitting; a 30-minute gap counts as rest</div>
-      <div class="vl">Longest 46h 22m</div>
+      <div class="pg"><div class="pgb" style="width:57%"></div></div><div class="vl">3.4 / 6 · Sit down. Stay.</div>
     </div></div>
 <div class="card ok plat" style="--tc:#7fd4d0" onclick="pick(this)">
     <div class="plaque"><span class="ic">🧘</span></div>
     <div class="meta">
       <div class="nm">Round-the-Clock Vibe<span class="tier">Platinum</span></div>
       <div class="ds">First and last thing of the day is the same thing: a 16-hour span</div>
-      <div class="vl">23.7h span in one day</div>
+      <div class="vl">23.6h span in one day</div>
     </div></div>
 <div class="card ok" style="--tc:#e8b339" onclick="pick(this)">
     <div class="plaque"><span class="ic">🗓️</span></div>
     <div class="meta">
       <div class="nm">Overbooked<span class="tier">Gold</span></div>
       <div class="ds">15 sessions in one day, every window "almost done"</div>
-      <div class="vl">Up to 54 sessions a day</div>
+      <div class="vl">Up to 47 sessions a day</div>
     </div></div>
 <div class="card ok" style="--tc:#e8b339" onclick="pick(this)">
     <div class="plaque"><span class="ic">🎪</span></div>
     <div class="meta">
       <div class="nm">Multithreaded Personality<span class="tier">Gold</span></div>
       <div class="ds">3 sessions in the same hour: errors on the left, "absolutely right" on the right</div>
-      <div class="vl">18 sessions in parallel</div>
+      <div class="vl">13 sessions in parallel</div>
     </div></div>
 <div class="card ok" style="--tc:#b08d57" onclick="pick(this)">
     <div class="plaque"><span class="ic">🔁</span></div>
@@ -238,14 +238,14 @@
     <div class="meta">
       <div class="nm">Meals Are Optional<span class="tier">Silver</span></div>
       <div class="ds">Online at both lunch and dinner, 10 days</div>
-      <div class="vl">57 days lunch + dinner online</div>
+      <div class="vl">48 days lunch + dinner online</div>
     </div></div>
 <div class="card ok" style="--tc:#b08d57" onclick="pick(this)">
     <div class="plaque"><span class="ic">🌤️</span></div>
     <div class="meta">
       <div class="nm">Weekend Warrior<span class="tier">Bronze</span></div>
       <div class="ds">Online on 10 weekend days; weekends are a myth</div>
-      <div class="vl">29 weekend days online</div>
+      <div class="vl">26 weekend days online</div>
     </div></div></div>
 
   <h2><span>💸 Cash Burn</span><span class="gs">4/4</span><span class="rule"></span></h2>
@@ -312,7 +312,7 @@
     <div class="meta">
       <div class="nm">Ship Machine<span class="tier">Gold</span></div>
       <div class="ds">100 commits, with messages written better than yours</div>
-      <div class="vl">197 commits</div>
+      <div class="vl">200 commits</div>
     </div></div>
 <div class="card ok" style="--tc:#9fb4c7" onclick="pick(this)">
     <div class="plaque"><span class="ic">💥</span></div>
@@ -359,19 +359,88 @@
   <footer><span class="big">Every number comes from local logs. Nothing made up.</span><br>3 platforms connected (Claude Code + Codex + OpenClaw) · generated offline · your data never leaves this machine<br><span class="brand">🏆 <b>vibe-trophy</b> · github.com/maxi-max-dev/vibe-trophy</span></footer>
 </div>
 <script>
+const SHARE_TITLE = "🏆 My Vibecoding Achievements";
+const SHARE_SUB = "35 / 37 unlocked";
+const SHARE_HEAD = "🏆 My Vibecoding Achievements — 35 / 37 unlocked (straight from local logs)";
+const MORE_TXT = "…and {n} more";
+const COPIED_TXT = "✅ Copied";
+const STATS4 = [{"v":"2026-03-11","l":"Joined"},{"v":"1289","l":"Sessions"},{"v":"90","l":"Active days"},{"v":"14.2B","l":"Total tokens (incl. cache)"}];
+const SEP = ": ";
+const REPO_URL = 'github.com/maxi-max-dev/vibe-trophy';
 function pick(el) {
   if (document.body.classList.contains('share') || el.classList.contains('locked')) return;
   el.classList.toggle('pick');
 }
+function shareSet(cap) {
+  const cards = [...document.querySelectorAll('.card.ok')];
+  const picked = cards.filter(c => c.classList.contains('pick'));
+  const tc = c => getComputedStyle(c).getPropertyValue('--tc').trim();
+  let set = picked.length ? picked
+    : [...cards.filter(c => tc(c) === '#7fd4d0'), ...cards.filter(c => tc(c) === '#e8b339')];
+  return cap ? set.slice(0, cap) : set;
+}
+function rowData(c) {
+  return {
+    icon: c.querySelector('.ic').textContent,
+    name: c.querySelector('.nm').childNodes[0].textContent,
+    tier: c.querySelector('.tier').textContent,
+    val: c.querySelector('.vl').textContent,
+    color: getComputedStyle(c).getPropertyValue('--tc').trim() || '#e8b339',
+  };
+}
 function toggleShare() {
   const b = document.body, cards = [...document.querySelectorAll('.card.ok')];
   if (!b.classList.contains('share')) {
-    const picked = cards.filter(c => c.classList.contains('pick'));
-    const gold = ['#e8b339', '#7fd4d0'];
-    const show = picked.length ? picked : cards.filter(c => gold.includes(getComputedStyle(c).getPropertyValue('--tc').trim()));
+    const show = shareSet(0);
     cards.forEach(c => c.classList.toggle('noshare', !show.includes(c)));
   }
   b.classList.toggle('share');
+}
+function rr(x, a, b, w, h, r) { x.beginPath(); x.moveTo(a + r, b); x.arcTo(a + w, b, a + w, b + h, r); x.arcTo(a + w, b + h, a, b + h, r); x.arcTo(a, b + h, a, b, r); x.arcTo(a, b, a + w, b, r); x.closePath(); }
+function exportPng() {
+  const all = shareSet(0), rows = all.slice(0, 8).map(rowData), extra = all.length - rows.length;
+  const W = 1080, Hh = 1350, F = '-apple-system, "PingFang SC", "Noto Sans SC", sans-serif';
+  const cv = document.createElement('canvas'); cv.width = W; cv.height = Hh;
+  const x = cv.getContext('2d');
+  x.fillStyle = '#101216'; x.fillRect(0, 0, W, Hh);
+  const g = x.createRadialGradient(180, -80, 0, 180, -80, 950);
+  g.addColorStop(0, 'rgba(232,179,57,0.10)'); g.addColorStop(1, 'rgba(0,0,0,0)');
+  x.fillStyle = g; x.fillRect(0, 0, W, Hh);
+  x.strokeStyle = '#2a2e37'; x.lineWidth = 2; rr(x, 26, 26, W - 52, Hh - 52, 30); x.stroke();
+  x.textBaseline = 'middle';
+  x.fillStyle = '#e8e6e3'; x.font = '700 50px ' + F; x.fillText(SHARE_TITLE, 72, 122);
+  x.fillStyle = '#8a8f98'; x.font = '400 27px ' + F; x.fillText(SHARE_SUB, 72, 180);
+  let sx = 72;
+  STATS4.forEach(s => {
+    x.fillStyle = '#ffd76a'; x.font = '700 40px ' + F; x.fillText(s.v, sx, 264);
+    const vw = x.measureText(s.v).width;
+    x.fillStyle = '#8a8f98'; x.font = '400 21px ' + F; x.fillText(s.l, sx, 304);
+    sx += Math.max(vw, x.measureText(s.l).width) + 52;
+  });
+  let y = 402;
+  rows.forEach(r => {
+    x.fillStyle = '#1c1f26'; rr(x, 72, y - 46, W - 144, 92, 18); x.fill();
+    x.strokeStyle = r.color; x.lineWidth = 1.5; rr(x, 72, y - 46, W - 144, 92, 18); x.stroke();
+    x.fillStyle = r.color; rr(x, 72, y - 46, 7, 92, 3); x.fill();
+    x.font = '40px ' + F; x.fillText(r.icon, 102, y + 2);
+    x.fillStyle = '#e8e6e3'; x.font = '700 31px ' + F; x.fillText(r.name, 172, y - 15);
+    const nw = x.measureText(r.name).width;
+    x.fillStyle = r.color; x.font = '400 21px ' + F; x.fillText(r.tier, 172 + nw + 16, y - 13);
+    x.fillStyle = '#ffd76a'; x.font = '400 25px ' + F; x.fillText(r.val, 172, y + 26);
+    y += 104;
+  });
+  if (extra > 0) { x.fillStyle = '#6b7280'; x.font = '400 25px ' + F; x.fillText(MORE_TXT.replace('{n}', extra), 84, y); }
+  x.fillStyle = '#8a8f98'; x.font = '400 23px ' + F; x.fillText('🏆 vibe-trophy · ' + REPO_URL, 72, Hh - 82);
+  cv.toBlob(b => { const a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = 'vibe-trophy.png'; a.click(); });
+}
+function copyStats() {
+  const lines = [SHARE_HEAD];
+  shareSet(6).map(rowData).forEach(r => lines.push(r.icon + ' ' + r.name + SEP + r.val));
+  lines.push('👉 https://' + REPO_URL);
+  navigator.clipboard.writeText(lines.join('\n')).then(() => {
+    const b = document.getElementById('copyBtn'), t = b.textContent;
+    b.textContent = COPIED_TXT; setTimeout(() => { b.textContent = t; }, 1500);
+  });
 }
 </script>
 </body>

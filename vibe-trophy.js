@@ -146,7 +146,7 @@ for (const src of active) {
   for (const f of files) {
     let lines;
     try { lines = fs.readFileSync(f, 'utf8').split('\n'); } catch { continue; }
-    let sTokens = 0, evts = [], isSide = false, burst = 0, prevTyped = '', fileLastTs = NaN, fileAuto = false;
+    let sTokens = 0, evts = [], humanTs = [], isSide = false, burst = 0, prevTyped = '', fileLastTs = NaN, fileAuto = false;
     for (const raw of lines) {
       if (!raw.trim()) continue;
       let j; try { j = JSON.parse(raw); } catch { continue; }
@@ -208,20 +208,21 @@ for (const src of active) {
           if (typedText === prevTyped && typedLen >= 2) S.repeats++;
           prevTyped = typedText;
           if (lineGap >= 2 * 36e5) { S.waits++; if (lineGap > S.maxWait) S.maxWait = lineGap; }
+          if (!isNaN(ts)) humanTs.push(ts); // 真人打字时刻，肝度成就的唯一原料
         }
       }
     }
     if (!isSide && evts.length) { S.sessions++; B.sessions++; }
     if (sTokens > S.maxSessionTokens) S.maxSessionTokens = sTokens;
-    // 时间类指标（肝度组的原料）只算人类会话，cron 拉起的不算
-    if (!fileAuto && evts.length) {
-      evts.sort((a, b) => a - b);
+    // 时间类指标（肝度组的原料）只认"真人打字的时刻"：cron 会话不算，代理自动跑的长尾也不算
+    if (!fileAuto && humanTs.length) {
+      humanTs.sort((a, b) => a - b);
       let run = 0;
-      for (let i = 1; i < evts.length; i++) {
-        if (evts[i] - evts[i - 1] <= 30 * 60e3) { run += evts[i] - evts[i - 1]; if (run > S.longestRun) S.longestRun = run; }
+      for (let i = 1; i < humanTs.length; i++) {
+        if (humanTs[i] - humanTs[i - 1] <= 30 * 60e3) { run += humanTs[i] - humanTs[i - 1]; if (run > S.longestRun) S.longestRun = run; }
         else run = 0;
       }
-      for (const ts of evts) {
+      for (const ts of humanTs) {
         const { date, hour } = local(ts);
         S.days.add(date);
         if (hour >= 2 && hour < 6) S.nightDays.add(date);
@@ -336,6 +337,7 @@ const UI = {
     tiers: { '铜': '铜', '银': '银', '金': '金', '白金': '白金' },
     foot1: '数据全部来自本地真实日志，一条没编。',
     foot2: (n, names) => `已接入 ${n} 平台（${names}）· 本地离线生成 · 数据不出这台电脑`,
+    exportBtn: '导出图片', copyBtn: '复制战绩', copied: '✅ 已复制', shareHeader: '我的 vibecoding 成就', moreTxt: n => `…还有 ${n} 项`, fromLogs: '数据来自本地真实日志',
   },
   en: {
     lang: 'en', title: 'My Vibecoding Achievements', doc: 'My Vibecoding Achievements',
@@ -348,6 +350,7 @@ const UI = {
     tiers: { '铜': 'Bronze', '银': 'Silver', '金': 'Gold', '白金': 'Platinum' },
     foot1: 'Every number comes from local logs. Nothing made up.',
     foot2: (n, names) => `${n} platforms connected (${names}) · generated offline · your data never leaves this machine`,
+    exportBtn: 'Export PNG', copyBtn: 'Copy stats', copied: '✅ Copied', shareHeader: 'My Vibecoding Achievements', moreTxt: n => `…and ${n} more`, fromLogs: 'straight from local logs',
   },
 };
 
@@ -378,6 +381,9 @@ function render(L) {
   const statValsEn = [joinDate, S.sessions, S.days.size, yiEn(totalTokens), yiEn(S.tokens.out), S.toolCalls, S.nightDays.size];
   const sv = L.lang === 'en' ? statValsEn : statVals;
   const srcParts = srcOn.map(b => `<b>${esc(b.name)}</b> ${b.sessions} ${L.sess}`).join(' · ');
+  const headLine = L.lang === 'en'
+    ? `🏆 ${L.shareHeader} — ${L.unlockedTxt(unlocked.length, A.length)} (${L.fromLogs})`
+    : `🏆 ${L.shareHeader} ${L.unlockedTxt(unlocked.length, A.length)}（${L.fromLogs}）`;
 
   return `<!DOCTYPE html>
 <html lang="${L.lang}">
@@ -457,7 +463,7 @@ function render(L) {
 <div class="wrap">
   <div class="bar">
     <h1>🏆 ${L.title}<span class="sub">${L.unlockedTxt(unlocked.length, A.length)}</span></h1>
-    <div class="actions"><a class="lswitch" href="${L.switchHref}">${L.switchTxt}</a><button onclick="toggleShare()">${L.share}</button></div>
+    <div class="actions"><a class="lswitch" href="${L.switchHref}">${L.switchTxt}</a><button id="copyBtn" onclick="copyStats()">${L.copyBtn}</button><button onclick="exportPng()">${L.exportBtn}</button><button onclick="toggleShare()">${L.share}</button></div>
   </div>
   <div class="stats">
 ${sv.map((v, i) => `    <div class="st${i >= 4 ? ' hideShare' : ''}"><b>${v}</b><span>${L.stats[i]}</span></div>`).join('\n')}
@@ -468,19 +474,88 @@ ${sections}
   <footer><span class="big">${L.foot1}</span><br>${L.foot2(srcOn.length, esc(srcNames))}<br><span class="brand">🏆 <b>vibe-trophy</b> · github.com/maxi-max-dev/vibe-trophy</span></footer>
 </div>
 <script>
+const SHARE_TITLE = ${JSON.stringify('🏆 ' + L.shareHeader)};
+const SHARE_SUB = ${JSON.stringify(L.unlockedTxt(unlocked.length, A.length))};
+const SHARE_HEAD = ${JSON.stringify(headLine)};
+const MORE_TXT = ${JSON.stringify(L.moreTxt('{n}'))};
+const COPIED_TXT = ${JSON.stringify(L.copied)};
+const STATS4 = ${JSON.stringify(sv.slice(0, 4).map((v, i) => ({ v: String(v), l: L.stats[i] })))};
+const SEP = ${JSON.stringify(L.lang === 'en' ? ': ' : '：')};
+const REPO_URL = 'github.com/maxi-max-dev/vibe-trophy';
 function pick(el) {
   if (document.body.classList.contains('share') || el.classList.contains('locked')) return;
   el.classList.toggle('pick');
 }
+function shareSet(cap) {
+  const cards = [...document.querySelectorAll('.card.ok')];
+  const picked = cards.filter(c => c.classList.contains('pick'));
+  const tc = c => getComputedStyle(c).getPropertyValue('--tc').trim();
+  let set = picked.length ? picked
+    : [...cards.filter(c => tc(c) === '#7fd4d0'), ...cards.filter(c => tc(c) === '#e8b339')];
+  return cap ? set.slice(0, cap) : set;
+}
+function rowData(c) {
+  return {
+    icon: c.querySelector('.ic').textContent,
+    name: c.querySelector('.nm').childNodes[0].textContent,
+    tier: c.querySelector('.tier').textContent,
+    val: c.querySelector('.vl').textContent,
+    color: getComputedStyle(c).getPropertyValue('--tc').trim() || '#e8b339',
+  };
+}
 function toggleShare() {
   const b = document.body, cards = [...document.querySelectorAll('.card.ok')];
   if (!b.classList.contains('share')) {
-    const picked = cards.filter(c => c.classList.contains('pick'));
-    const gold = ['#e8b339', '#7fd4d0'];
-    const show = picked.length ? picked : cards.filter(c => gold.includes(getComputedStyle(c).getPropertyValue('--tc').trim()));
+    const show = shareSet(0);
     cards.forEach(c => c.classList.toggle('noshare', !show.includes(c)));
   }
   b.classList.toggle('share');
+}
+function rr(x, a, b, w, h, r) { x.beginPath(); x.moveTo(a + r, b); x.arcTo(a + w, b, a + w, b + h, r); x.arcTo(a + w, b + h, a, b + h, r); x.arcTo(a, b + h, a, b, r); x.arcTo(a, b, a + w, b, r); x.closePath(); }
+function exportPng() {
+  const all = shareSet(0), rows = all.slice(0, 8).map(rowData), extra = all.length - rows.length;
+  const W = 1080, Hh = 1350, F = '-apple-system, "PingFang SC", "Noto Sans SC", sans-serif';
+  const cv = document.createElement('canvas'); cv.width = W; cv.height = Hh;
+  const x = cv.getContext('2d');
+  x.fillStyle = '#101216'; x.fillRect(0, 0, W, Hh);
+  const g = x.createRadialGradient(180, -80, 0, 180, -80, 950);
+  g.addColorStop(0, 'rgba(232,179,57,0.10)'); g.addColorStop(1, 'rgba(0,0,0,0)');
+  x.fillStyle = g; x.fillRect(0, 0, W, Hh);
+  x.strokeStyle = '#2a2e37'; x.lineWidth = 2; rr(x, 26, 26, W - 52, Hh - 52, 30); x.stroke();
+  x.textBaseline = 'middle';
+  x.fillStyle = '#e8e6e3'; x.font = '700 50px ' + F; x.fillText(SHARE_TITLE, 72, 122);
+  x.fillStyle = '#8a8f98'; x.font = '400 27px ' + F; x.fillText(SHARE_SUB, 72, 180);
+  let sx = 72;
+  STATS4.forEach(s => {
+    x.fillStyle = '#ffd76a'; x.font = '700 40px ' + F; x.fillText(s.v, sx, 264);
+    const vw = x.measureText(s.v).width;
+    x.fillStyle = '#8a8f98'; x.font = '400 21px ' + F; x.fillText(s.l, sx, 304);
+    sx += Math.max(vw, x.measureText(s.l).width) + 52;
+  });
+  let y = 402;
+  rows.forEach(r => {
+    x.fillStyle = '#1c1f26'; rr(x, 72, y - 46, W - 144, 92, 18); x.fill();
+    x.strokeStyle = r.color; x.lineWidth = 1.5; rr(x, 72, y - 46, W - 144, 92, 18); x.stroke();
+    x.fillStyle = r.color; rr(x, 72, y - 46, 7, 92, 3); x.fill();
+    x.font = '40px ' + F; x.fillText(r.icon, 102, y + 2);
+    x.fillStyle = '#e8e6e3'; x.font = '700 31px ' + F; x.fillText(r.name, 172, y - 15);
+    const nw = x.measureText(r.name).width;
+    x.fillStyle = r.color; x.font = '400 21px ' + F; x.fillText(r.tier, 172 + nw + 16, y - 13);
+    x.fillStyle = '#ffd76a'; x.font = '400 25px ' + F; x.fillText(r.val, 172, y + 26);
+    y += 104;
+  });
+  if (extra > 0) { x.fillStyle = '#6b7280'; x.font = '400 25px ' + F; x.fillText(MORE_TXT.replace('{n}', extra), 84, y); }
+  x.fillStyle = '#8a8f98'; x.font = '400 23px ' + F; x.fillText('🏆 vibe-trophy · ' + REPO_URL, 72, Hh - 82);
+  cv.toBlob(b => { const a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = 'vibe-trophy.png'; a.click(); });
+}
+function copyStats() {
+  const lines = [SHARE_HEAD];
+  shareSet(6).map(rowData).forEach(r => lines.push(r.icon + ' ' + r.name + SEP + r.val));
+  lines.push('👉 https://' + REPO_URL);
+  navigator.clipboard.writeText(lines.join('\\n')).then(() => {
+    const b = document.getElementById('copyBtn'), t = b.textContent;
+    b.textContent = COPIED_TXT; setTimeout(() => { b.textContent = t; }, 1500);
+  });
 }
 </script>
 </body>
