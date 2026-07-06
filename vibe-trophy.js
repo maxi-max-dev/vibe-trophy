@@ -319,7 +319,7 @@ const html = `<!DOCTYPE html>
   </div>
   <div class="tip">点卡片选中「晒」标记，晒图模式只显示选中的；不选则默认晒金/白金。</div>
 ${sections}
-  <footer><span class="big">数据全部来自本地真实日志，一条没编。</span><br>本地离线生成 · 数据不出这台电脑 · vibe-trophy v0.2（占位名）</footer>
+  <footer><span class="big">数据全部来自本地真实日志，一条没编。</span><br>本地离线生成 · 数据不出这台电脑 · vibe-trophy v0.3（占位名）</footer>
 </div>
 <script>
 function pick(el) {
