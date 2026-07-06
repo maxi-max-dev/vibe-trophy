@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// vibe-trophy（占位名）v0.4 · 从本地 AI 编程日志生成你的 vibecoding 成就
+// vibe-trophy v0.5 · 从本地 AI 编程日志生成你的 vibecoding 成就
 // 支持: Claude Code / Codex / OpenClaw（适配器架构，有本地日志的平台都能接）
 // 用法: node vibe-trophy.js [--tz=Asia/Shanghai] [--out=index.html] [--src=claude,codex,openclaw]
 // 只读本地日志，零依赖，不联网，数据不出这台电脑。
@@ -13,7 +13,9 @@ const arg = (k, d) => {
   return a ? a.slice(k.length + 3) : d;
 };
 const TZ = arg('tz', 'Asia/Shanghai');
-const OUT = path.resolve(__dirname, arg('out', 'index.html'));
+// npx 跑的时候脚本躺在缓存目录里，输出写到用户当前目录
+const BASE = /node_modules|_npx/.test(__dirname) ? process.cwd() : __dirname;
+const OUT = path.resolve(BASE, arg('out', 'index.html'));
 const ONLY = arg('src', '').split(',').filter(Boolean);
 
 function walk(d, out = []) {
@@ -413,7 +415,7 @@ const html = `<!DOCTYPE html>
   <div class="srcs">🧩 已接入 <b>${srcOn.length}</b> 个平台：${srcOn.map(b => `<b>${esc(b.name)}</b> ${b.sessions} 场`).join(' · ')}</div>
   <div class="tip">点卡片选中「晒」标记，晒图模式只显示选中的；不选则默认晒金/白金。</div>
 ${sections}
-  <footer><span class="big">数据全部来自本地真实日志，一条没编。</span><br>已接入 ${srcOn.length} 平台（${esc(srcNames)}）· 本地离线生成 · 数据不出这台电脑 · vibe-trophy v0.4（占位名）</footer>
+  <footer><span class="big">数据全部来自本地真实日志，一条没编。</span><br>已接入 ${srcOn.length} 平台（${esc(srcNames)}）· 本地离线生成 · 数据不出这台电脑 · vibe-trophy v0.5</footer>
 </div>
 <script>
 function pick(el) {

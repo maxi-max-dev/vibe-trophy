@@ -1,4 +1,4 @@
-# vibe-trophy（占位名，待定名）
+# vibe-trophy 🏆
 
 从你本地的 AI 编程日志，算出你的 vibecoding 成就。
 
@@ -20,10 +20,10 @@
 ## 用法
 
 ```bash
-node vibe-trophy.js
+npx github:maxi-max-dev/vibe-trophy
 ```
 
-跑完打开同目录下的 `index.html`。
+或者 clone 后 `node vibe-trophy.js`。跑完打开生成的 `index.html`。
 
 可选参数：`--tz=Asia/Shanghai`（深夜成就按哪个时区算），`--out=index.html`（输出文件名），`--src=claude,codex,openclaw`（只统计指定平台）。
 
@@ -38,6 +38,16 @@ node vibe-trophy.js
 
 - 只读上表列出的本地日志目录，零依赖，不联网，数据不出这台电脑
 - 生成的页面里只有统计数字，不含任何项目路径、消息原文和代码内容
+
+## English (quick)
+
+Steam-style achievements for your vibe coding, computed **locally** from your own AI-coding logs (Claude Code / Codex / OpenClaw adapters so far; anything with local logs can get one). Zero dependencies, fully offline, nothing leaves your machine, and the page contains only aggregate numbers, never message text or file paths.
+
+```bash
+npx github:maxi-max-dev/vibe-trophy
+```
+
+37 achievements incl. hidden ones (one is a tribute to Visual Studio Achievements' Potty Mouth, 2012). Locked achievements show progress bars. Time-based achievements count human sessions only, cron-spawned agent sessions are excluded, so the grind is really yours. The [demo](https://maxi-max-dev.github.io/vibe-trophy/) is the author's own wall, straight from the logs.
 
 ## 致谢
 

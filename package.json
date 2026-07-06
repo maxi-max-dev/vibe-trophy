@@ -1,0 +1,10 @@
+{
+  "name": "vibe-trophy",
+  "version": "0.5.0",
+  "description": "Steam-style achievements computed locally from your own AI-coding logs (Claude Code / Codex / OpenClaw). 从本地 AI 编程日志算出你的 vibecoding 成就。",
+  "bin": { "vibe-trophy": "./vibe-trophy.js" },
+  "author": "Max",
+  "license": "MIT",
+  "repository": { "type": "git", "url": "https://github.com/maxi-max-dev/vibe-trophy.git" },
+  "keywords": ["claude-code", "codex", "achievements", "vibe-coding", "gamification"]
+}
