@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>My Vibecoding Achievements</title>
+<title>我的 vibecoding 成就</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🏆</text></svg>">
 <style>
   :root { color-scheme: dark; }
@@ -76,297 +76,297 @@
 <body>
 <div class="wrap">
   <div class="bar">
-    <h1>🏆 My Vibecoding Achievements<span class="sub">35 / 37 unlocked</span></h1>
-    <div class="actions"><a class="lswitch try" href="./">🧮 Try yours</a><a class="lswitch" href="demo.html">中</a><button id="copyBtn" onclick="copyStats()">Copy stats</button><button onclick="exportPng()">Export PNG</button><button onclick="toggleShare()">Share mode</button></div>
+    <h1>🏆 我的 vibecoding 成就<span class="sub">解锁 35 / 37</span></h1>
+    <div class="actions"><a class="lswitch try" href="./">🧮 算算你的</a><a class="lswitch" href="en.html">EN</a><button id="copyBtn" onclick="copyStats()">复制战绩</button><button onclick="exportPng()">导出图片</button><button onclick="toggleShare()">晒图模式</button></div>
   </div>
   <div class="stats">
-    <div class="st"><b>2026-03-11</b><span>Joined</span></div>
-    <div class="st"><b>1291</b><span>Sessions</span></div>
-    <div class="st"><b>90</b><span>Active days</span></div>
-    <div class="st"><b>14.5B</b><span>Total tokens (incl. cache)</span></div>
-    <div class="st hideShare"><b>103.7M</b><span>Output tokens</span></div>
-    <div class="st hideShare"><b>68959</b><span>Tool calls</span></div>
-    <div class="st hideShare"><b>38</b><span>Late nights</span></div>
+    <div class="st"><b>2026-03-11</b><span>入坑日</span></div>
+    <div class="st"><b>1291</b><span>会话</span></div>
+    <div class="st"><b>90</b><span>活跃天</span></div>
+    <div class="st"><b>144.7 亿</b><span>累计 token（含缓存）</span></div>
+    <div class="st hideShare"><b>1.0 亿</b><span>输出 token</span></div>
+    <div class="st hideShare"><b>68959</b><span>工具调用</span></div>
+    <div class="st hideShare"><b>38</b><span>深夜场</span></div>
   </div>
-  <div class="srcs">🧩 <b>3</b> platforms connected: <b>Claude Code</b> 588 sessions · <b>Codex</b> 10 sessions · <b>OpenClaw</b> 693 sessions</div>
-  <div class="tip">Click cards to mark them for sharing; share mode shows only marked cards (default: gold & platinum).</div>
+  <div class="srcs">🧩 已接入 <b>3</b> 个平台：<b>Claude Code</b> 588 场 · <b>Codex</b> 10 场 · <b>OpenClaw</b> 693 场</div>
+  <div class="tip">点卡片选中「晒」标记，晒图模式只显示选中的；不选则默认晒金/白金。</div>
 
-  <h2><span>🌱 Daily</span><span class="gs">11/11</span><span class="rule"></span></h2>
+  <h2><span>🌱 日常</span><span class="gs">11/11</span><span class="rule"></span></h2>
   <div class="grid"><div class="card ok" style="--tc:#b08d57" onclick="pick(this)">
     <div class="plaque"><span class="ic">👋</span></div>
     <div class="meta">
-      <div class="nm">Hello World<span class="tier">Bronze</span></div>
-      <div class="ds">Opened an AI coding tool once; never hand-wrote code again</div>
-      <div class="vl">Joined 2026-03-11</div>
+      <div class="nm">Hello World<span class="tier">铜</span></div>
+      <div class="ds">第一次打开 AI 编程工具，从此再没亲手写过代码</div>
+      <div class="vl">入坑于 2026-03-11</div>
     </div></div>
 <div class="card ok" style="--tc:#e8b339" onclick="pick(this)">
     <div class="plaque"><span class="ic">🧩</span></div>
     <div class="meta">
-      <div class="nm">Cross-Stack Player<span class="tier">Gold</span></div>
-      <div class="ds">Taming 2+ AI coding platforms at once; eggs, many baskets</div>
-      <div class="vl">3 platforms: Claude Code + Codex + OpenClaw</div>
+      <div class="nm">跨栈玩家<span class="tier">金</span></div>
+      <div class="ds">同时驯服 2 个以上 AI 编程平台，鸡蛋不放一个篮子</div>
+      <div class="vl">3 个平台：Claude Code + Codex + OpenClaw</div>
     </div></div>
 <div class="card ok plat" style="--tc:#7fd4d0" onclick="pick(this)">
     <div class="plaque"><span class="ic">🛸</span></div>
     <div class="meta">
-      <div class="nm">Fleet Commander<span class="tier">Platinum</span><span class="tier hdt">hidden</span></div>
-      <div class="ds">3+ platforms enlisted. You are not a user, you are an admiral</div>
-      <div class="vl">Fleet: Claude Code + Codex + OpenClaw</div>
+      <div class="nm">全栈指挥官<span class="tier">白金</span><span class="tier hdt">隐藏</span></div>
+      <div class="ds">3 个平台同时在册，你不是用户，你是舰队司令</div>
+      <div class="vl">舰队编制：Claude Code + Codex + OpenClaw</div>
     </div></div>
 <div class="card ok" style="--tc:#9fb4c7" onclick="pick(this)">
     <div class="plaque"><span class="ic">🗺️</span></div>
     <div class="meta">
-      <div class="nm">Repo Casanova<span class="tier">Silver</span></div>
-      <div class="ds">Juggling 10+ projects, each one sworn to be "the main one"</div>
-      <div class="vl">135 project folders</div>
+      <div class="nm">项目海王<span class="tier">银</span></div>
+      <div class="ds">同时撩 10 个以上项目，每一个都说过"这是主线"</div>
+      <div class="vl">135 个项目</div>
     </div></div>
 <div class="card ok" style="--tc:#9fb4c7" onclick="pick(this)">
     <div class="plaque"><span class="ic">🧰</span></div>
     <div class="meta">
-      <div class="nm">Gear Head<span class="tier">Silver</span></div>
-      <div class="ds">500 MCP tool calls; more tools than tasks</div>
-      <div class="vl">3582 MCP calls</div>
+      <div class="nm">装备党<span class="tier">银</span></div>
+      <div class="ds">MCP 工具调用 500 次，工具比活儿多</div>
+      <div class="vl">3582 次 MCP 调用</div>
     </div></div>
 <div class="card ok" style="--tc:#b08d57" onclick="pick(this)">
     <div class="plaque"><span class="ic">🖼️</span></div>
     <div class="meta">
-      <div class="nm">Screenshot Diplomat<span class="tier">Bronze</span></div>
-      <div class="ds">"Just make it look like this" — 10 screenshots thrown</div>
-      <div class="vl">83 images thrown</div>
+      <div class="nm">一图胜千言<span class="tier">铜</span></div>
+      <div class="ds">截图一甩："就照这个做"，累计 10 张</div>
+      <div class="vl">甩过 83 张图</div>
     </div></div>
 <div class="card ok" style="--tc:#9fb4c7" onclick="pick(this)">
     <div class="plaque"><span class="ic">📚</span></div>
     <div class="meta">
-      <div class="nm">Prompt Novelist<span class="tier">Silver</span></div>
-      <div class="ds">500+ chars in one message; that is not a prompt, that is a spec</div>
-      <div class="vl">Longest 139256 chars · 1658 over 500</div>
+      <div class="nm">提示词小说家<span class="tier">银</span></div>
+      <div class="ds">单条消息 500 字起步，这不是 prompt 是需求文档</div>
+      <div class="vl">最长一条 139256 字，超500字共 1658 条</div>
     </div></div>
 <div class="card ok" style="--tc:#9fb4c7" onclick="pick(this)">
     <div class="plaque"><span class="ic">🤏</span></div>
     <div class="meta">
-      <div class="nm">Man of Few Words<span class="tier">Silver</span></div>
-      <div class="ds">20 commands of two characters or less; "go" is the strongest prompt</div>
-      <div class="vl">167 micro-commands</div>
+      <div class="nm">一字千金<span class="tier">银</span></div>
+      <div class="ds">两个字以内的指令发了 20 条，"继续"就是最强 prompt</div>
+      <div class="vl">167 条极简指令</div>
     </div></div>
 <div class="card ok" style="--tc:#b08d57" onclick="pick(this)">
     <div class="plaque"><span class="ic">🔂</span></div>
     <div class="meta">
-      <div class="nm">Broken Record<span class="tier">Bronze</span></div>
-      <div class="ds">Re-sent the exact same message, 5 times. Try again. Try a-gain</div>
-      <div class="vl">94 exact re-sends</div>
+      <div class="nm">复读机<span class="tier">铜</span></div>
+      <div class="ds">一字不差把同一句话再发一遍，共 5 次。再试一次，再试亿次</div>
+      <div class="vl">94 次原句重发</div>
     </div></div>
 <div class="card ok" style="--tc:#b08d57" onclick="pick(this)">
     <div class="plaque"><span class="ic">🧭</span></div>
     <div class="meta">
-      <div class="nm">Link Dealer<span class="tier">Bronze</span></div>
-      <div class="ds">Threw 50 URLs: "see for yourself"</div>
-      <div class="vl">332 messages with links</div>
+      <div class="nm">导航员<span class="tier">铜</span></div>
+      <div class="ds">甩了 50 个链接过去："你自己去看"</div>
+      <div class="vl">332 条带链接消息</div>
     </div></div>
 <div class="card ok" style="--tc:#b08d57" onclick="pick(this)">
     <div class="plaque"><span class="ic">🪞</span></div>
     <div class="meta">
-      <div class="nm">Meta Achievement<span class="tier">Bronze</span><span class="tier hdt">hidden</span></div>
-      <div class="ds">Using an achievement system to admire your achievements</div>
-      <div class="vl">You're looking at it</div>
+      <div class="nm">元成就<span class="tier">铜</span><span class="tier hdt">隐藏</span></div>
+      <div class="ds">用一个成就系统，围观自己的成就</div>
+      <div class="vl">你正在看它</div>
     </div></div></div>
 
-  <h2><span>🌙 Grind</span><span class="gs">10/11</span><span class="rule"></span></h2>
+  <h2><span>🌙 肝度</span><span class="gs">10/11</span><span class="rule"></span></h2>
   <div class="grid"><div class="card ok" style="--tc:#9fb4c7" onclick="pick(this)">
     <div class="plaque"><span class="ic">🌙</span></div>
     <div class="meta">
-      <div class="nm">3 AM Club<span class="tier">Silver</span></div>
-      <div class="ds">Vibing between 2 and 6 AM; the world is just you and a loading spinner</div>
-      <div class="vl">38 late nights</div>
+      <div class="nm">凌晨三点俱乐部<span class="tier">银</span></div>
+      <div class="ds">02:00–06:00 还在 vibe，全世界只剩你和它的 loading</div>
+      <div class="vl">38 个深夜</div>
     </div></div>
 <div class="card ok" style="--tc:#e8b339" onclick="pick(this)">
     <div class="plaque"><span class="ic">🧛</span></div>
     <div class="meta">
-      <div class="nm">Vampire Schedule<span class="tier">Gold</span></div>
-      <div class="ds">3 nights in a row; wrap up before sunrise</div>
-      <div class="vl">18 consecutive late nights</div>
+      <div class="nm">吸血鬼作息<span class="tier">金</span></div>
+      <div class="ds">连续 3 天深夜营业，太阳升起前必须收工</div>
+      <div class="vl">连续 18 天深夜在线</div>
     </div></div>
 <div class="card ok" style="--tc:#e8b339" onclick="pick(this)">
     <div class="plaque"><span class="ic">🌅</span></div>
     <div class="meta">
-      <div class="nm">Sunrise Witness<span class="tier">Gold</span><span class="tier hdt">hidden</span></div>
-      <div class="ds">Online at 5 AM. Nobody knows if you stayed up or got up</div>
-      <div class="vl">29 sunrises</div>
+      <div class="nm">日出见证者<span class="tier">金</span><span class="tier hdt">隐藏</span></div>
+      <div class="ds">清晨五点还在线。没人知道你是没睡，还是刚醒</div>
+      <div class="vl">29 次日出</div>
     </div></div>
 <div class="card ok" style="--tc:#9fb4c7" onclick="pick(this)">
     <div class="plaque"><span class="ic">📅</span></div>
     <div class="meta">
-      <div class="nm">Seven-Day Streak<span class="tier">Silver</span></div>
-      <div class="ds">Sessions 7 days straight. Rest is for model maintenance days</div>
-      <div class="vl">Longest streak 34 days</div>
+      <div class="nm">七天连勤<span class="tier">银</span></div>
+      <div class="ds">连续 7 天有会话。休息？那是模型维护日干的事</div>
+      <div class="vl">最长连勤 34 天</div>
     </div></div>
 <div class="card locked" style="--tc:#e8b339" onclick="pick(this)">
     <div class="plaque"><span class="ic">🔒</span></div>
     <div class="meta">
-      <div class="nm">Marathon Runner<span class="tier">Gold</span></div>
-      <div class="ds">6 hours in one sitting; a 30-minute gap counts as rest</div>
-      <div class="pg"><div class="pgb" style="width:57%"></div></div><div class="vl">3.4 / 6 · Sit down. Stay.</div>
+      <div class="nm">马拉松选手<span class="tier">金</span></div>
+      <div class="ds">一口气连续会话 6 小时，断档半小时算休息</div>
+      <div class="pg"><div class="pgb" style="width:57%"></div></div><div class="vl">3.4 / 6 · 坐下，别起来</div>
     </div></div>
 <div class="card ok plat" style="--tc:#7fd4d0" onclick="pick(this)">
     <div class="plaque"><span class="ic">🧘</span></div>
     <div class="meta">
-      <div class="nm">Round-the-Clock Vibe<span class="tier">Platinum</span></div>
-      <div class="ds">First and last thing of the day is the same thing: a 16-hour span</div>
-      <div class="vl">23.6h span in one day</div>
+      <div class="nm">全天候 Vibe<span class="tier">白金</span></div>
+      <div class="ds">睁眼第一件事和闭眼最后一件事是同一件事，单日跨度 16 小时</div>
+      <div class="vl">单日跨度 23.6 小时</div>
     </div></div>
 <div class="card ok" style="--tc:#e8b339" onclick="pick(this)">
     <div class="plaque"><span class="ic">🗓️</span></div>
     <div class="meta">
-      <div class="nm">Overbooked<span class="tier">Gold</span></div>
-      <div class="ds">15 sessions in one day, every window "almost done"</div>
-      <div class="vl">Up to 47 sessions a day</div>
+      <div class="nm">日理万机<span class="tier">金</span></div>
+      <div class="ds">单日开 15 场会话，每个窗口都在"快好了"</div>
+      <div class="vl">单日最多 47 场</div>
     </div></div>
 <div class="card ok" style="--tc:#e8b339" onclick="pick(this)">
     <div class="plaque"><span class="ic">🎪</span></div>
     <div class="meta">
-      <div class="nm">Multithreaded Personality<span class="tier">Gold</span></div>
-      <div class="ds">3 sessions in the same hour: errors on the left, "absolutely right" on the right</div>
-      <div class="vl">13 sessions in parallel</div>
+      <div class="nm">多线程人格<span class="tier">金</span></div>
+      <div class="ds">同一小时 3 路会话并行：左手报错，右手"你说得对"</div>
+      <div class="vl">最高并行 13 路</div>
     </div></div>
 <div class="card ok" style="--tc:#b08d57" onclick="pick(this)">
     <div class="plaque"><span class="ic">🔁</span></div>
     <div class="meta">
-      <div class="nm">Back Again<span class="tier">Bronze</span><span class="tier hdt">hidden</span></div>
-      <div class="ds">Quit for 7 days. Came back anyway</div>
-      <div class="vl">Welcome home</div>
+      <div class="nm">我又回来了<span class="tier">铜</span><span class="tier hdt">隐藏</span></div>
+      <div class="ds">戒了 7 天，还是回来了</div>
+      <div class="vl">欢迎回家</div>
     </div></div>
 <div class="card ok" style="--tc:#9fb4c7" onclick="pick(this)">
     <div class="plaque"><span class="ic">🍜</span></div>
     <div class="meta">
-      <div class="nm">Meals Are Optional<span class="tier">Silver</span></div>
-      <div class="ds">Online at both lunch and dinner, 10 days</div>
-      <div class="vl">48 days lunch + dinner online</div>
+      <div class="nm">饭点不存在<span class="tier">银</span></div>
+      <div class="ds">午饭点和晚饭点都在线，共 10 天。干饭不如干活</div>
+      <div class="vl">48 天午晚连线</div>
     </div></div>
 <div class="card ok" style="--tc:#b08d57" onclick="pick(this)">
     <div class="plaque"><span class="ic">🌤️</span></div>
     <div class="meta">
-      <div class="nm">Weekend Warrior<span class="tier">Bronze</span></div>
-      <div class="ds">Online on 10 weekend days; weekends are a myth</div>
-      <div class="vl">26 weekend days online</div>
+      <div class="nm">周末战士<span class="tier">铜</span></div>
+      <div class="ds">周六周日也在线 10 天，双休是不存在的</div>
+      <div class="vl">周末上线 26 天</div>
     </div></div></div>
 
-  <h2><span>💸 Cash Burn</span><span class="gs">4/4</span><span class="rule"></span></h2>
+  <h2><span>💸 钞能力</span><span class="gs">4/4</span><span class="rule"></span></h2>
   <div class="grid"><div class="card ok" style="--tc:#e8b339" onclick="pick(this)">
     <div class="plaque"><span class="ic">🔥</span></div>
     <div class="meta">
-      <div class="nm">Token Furnace<span class="tier">Gold</span></div>
-      <div class="ds">50M+ tokens in one session; faster than your power meter</div>
-      <div class="vl">Record 728.4M in one session</div>
+      <div class="nm">烧 token 大户<span class="tier">金</span></div>
+      <div class="ds">单次会话烧掉 5000 万 token，电表都没你转得快</div>
+      <div class="vl">单会话纪录 7.3 亿</div>
     </div></div>
 <div class="card ok plat" style="--tc:#7fd4d0" onclick="pick(this)">
     <div class="plaque"><span class="ic">💯</span></div>
     <div class="meta">
-      <div class="nm">Hundred-Million Club<span class="tier">Platinum</span><span class="tier hdt">hidden</span></div>
-      <div class="ds">100M+ tokens in one session. Tribute to the legendary 120M guy</div>
-      <div class="vl">Record 728.4M in one session</div>
+      <div class="nm">亿级玩家<span class="tier">白金</span><span class="tier hdt">隐藏</span></div>
+      <div class="ds">单会话破 1 亿 token。致敬传说中 1.2 亿的那位</div>
+      <div class="vl">单会话纪录 7.3 亿</div>
     </div></div>
 <div class="card ok" style="--tc:#e8b339" onclick="pick(this)">
     <div class="plaque"><span class="ic">🐷</span></div>
     <div class="meta">
-      <div class="nm">Cache Freeloader<span class="tier">Gold</span></div>
-      <div class="ds">1B+ cached tokens; every hit is free money</div>
-      <div class="vl">12.3B freeloaded</div>
+      <div class="nm">缓存白嫖怪<span class="tier">金</span></div>
+      <div class="ds">缓存命中累计 10 亿 token，省下的都是赚的</div>
+      <div class="vl">白嫖 123.3 亿</div>
     </div></div>
 <div class="card ok" style="--tc:#9fb4c7" onclick="pick(this)">
     <div class="plaque"><span class="ic">🚧</span></div>
     <div class="meta">
-      <div class="nm">Rate-Limit Survivor<span class="tier">Silver</span><span class="tier hdt">hidden</span></div>
-      <div class="ds">Hit the usage wall and came back for more</div>
-      <div class="vl">The wall remembers you</div>
+      <div class="nm">额度撞墙<span class="tier">银</span><span class="tier hdt">隐藏</span></div>
+      <div class="ds">撞过用量上限还回来继续，墙都不服就服你</div>
+      <div class="vl">这面墙记住你了</div>
     </div></div></div>
 
-  <h2><span>🎮 Micro-ops</span><span class="gs">10/11</span><span class="rule"></span></h2>
+  <h2><span>🎮 微操</span><span class="gs">10/11</span><span class="rule"></span></h2>
   <div class="grid"><div class="card ok" style="--tc:#e8b339" onclick="pick(this)">
     <div class="plaque"><span class="ic">🏗️</span></div>
     <div class="meta">
-      <div class="nm">The Foreman<span class="tier">Gold</span></div>
-      <div class="ds">100 subagents dispatched; the art of not doing the work yourself</div>
-      <div class="vl">375 clones dispatched</div>
+      <div class="nm">包工头<span class="tier">金</span></div>
+      <div class="ds">派出 100 个子代理，精通自己不干活的艺术</div>
+      <div class="vl">已派 375 个分身</div>
     </div></div>
 <div class="card ok" style="--tc:#e8b339" onclick="pick(this)">
     <div class="plaque"><span class="ic">🧨</span></div>
     <div class="meta">
-      <div class="nm">One-Prompt Wonder<span class="tier">Gold</span></div>
-      <div class="ds">One instruction, 50+ tool calls without catching a breath</div>
-      <div class="vl">Longest combo 297</div>
+      <div class="nm">一句话工程<span class="tier">金</span></div>
+      <div class="ds">一条指令，AI 连打 50 个工具调用不带喘</div>
+      <div class="vl">最长连击 297</div>
     </div></div>
 <div class="card ok" style="--tc:#9fb4c7" onclick="pick(this)">
     <div class="plaque"><span class="ic">🫡</span></div>
     <div class="meta">
-      <div class="nm">"You're Absolutely Right"<span class="tier">Silver</span></div>
-      <div class="ds">Heard it 50 times. And you absolutely were</div>
-      <div class="vl">88 times</div>
+      <div class="nm">你说得对学派<span class="tier">银</span></div>
+      <div class="ds">被 AI 说过 50 次"你说得对"，而你确实说得对</div>
+      <div class="vl">88 次</div>
     </div></div>
 <div class="card ok" style="--tc:#9fb4c7" onclick="pick(this)">
     <div class="plaque"><span class="ic">🛑</span></div>
     <div class="meta">
-      <div class="nm">Emergency Brake<span class="tier">Silver</span></div>
-      <div class="ds">20 Esc presses; the brake is your last dignity</div>
-      <div class="vl">111 brakes</div>
+      <div class="nm">刹车侠<span class="tier">银</span></div>
+      <div class="ds">按 20 次 Esc 打断输出。刹车是最后的尊严</div>
+      <div class="vl">踩了 111 脚刹车</div>
     </div></div>
 <div class="card ok" style="--tc:#e8b339" onclick="pick(this)">
     <div class="plaque"><span class="ic">🚢</span></div>
     <div class="meta">
-      <div class="nm">Ship Machine<span class="tier">Gold</span></div>
-      <div class="ds">100 commits, with messages written better than yours</div>
-      <div class="vl">218 commits</div>
+      <div class="nm">Ship 机器<span class="tier">金</span></div>
+      <div class="ds">经手 100 个 commit，信息还都写得比你好</div>
+      <div class="vl">218 个 commit</div>
     </div></div>
 <div class="card ok" style="--tc:#9fb4c7" onclick="pick(this)">
     <div class="plaque"><span class="ic">💥</span></div>
     <div class="meta">
-      <div class="nm">Context Bomber<span class="tier">Silver</span></div>
-      <div class="ds">Talked the AI into amnesia 10 times; compaction is a lifestyle</div>
-      <div class="vl">34 blackouts</div>
+      <div class="nm">上下文爆破手<span class="tier">银</span></div>
+      <div class="ds">把对话聊到失忆 10 次，compact 是一种境界</div>
+      <div class="vl">34 次失忆</div>
     </div></div>
 <div class="card ok" style="--tc:#9fb4c7" onclick="pick(this)">
     <div class="plaque"><span class="ic">🎰</span></div>
     <div class="meta">
-      <div class="nm">Model Collector<span class="tier">Silver</span></div>
-      <div class="ds">3+ models: one works, one runs errands, one takes the blame</div>
-      <div class="vl">15 models</div>
+      <div class="nm">全家桶收集者<span class="tier">银</span></div>
+      <div class="ds">用过 3 种以上模型：有的干活，有的跑腿，有的背锅</div>
+      <div class="vl">15 种模型</div>
     </div></div>
 <div class="card ok" style="--tc:#b08d57" onclick="pick(this)">
     <div class="plaque"><span class="ic">🙋</span></div>
     <div class="meta">
-      <div class="nm">The Client<span class="tier">Bronze</span></div>
-      <div class="ds">The AI asked YOU for requirements 20 times; that is leverage</div>
-      <div class="vl">Asked 136 times</div>
+      <div class="nm">甲方本人<span class="tier">铜</span></div>
+      <div class="ds">被 AI 反过来追问 20 次需求，这就是话语权</div>
+      <div class="vl">被追问 136 次</div>
     </div></div>
 <div class="card locked" style="--tc:#b08d57" onclick="pick(this)">
     <div class="plaque"><span class="ic">🔒</span></div>
     <div class="meta">
-      <div class="nm">Politeness Award<span class="tier">Bronze</span></div>
-      <div class="ds">Said thanks 20 times. It will not remember, but you are a good person</div>
+      <div class="nm">人机礼仪模范<span class="tier">铜</span></div>
+      <div class="ds">对 AI 说了 20 次谢谢。它记不住，但你是好人</div>
       <div class="pg"><div class="pgb" style="width:25%"></div></div><div class="vl">5 / 20</div>
     </div></div>
 <div class="card ok" style="--tc:#e8b339" onclick="pick(this)">
     <div class="plaque"><span class="ic">🤬</span></div>
     <div class="meta">
-      <div class="nm">Potty Mouth<span class="tier">Gold</span><span class="tier hdt">hidden</span></div>
-      <div class="ds">Swore at the AI 10 times. A tribute to Visual Studio Achievements (2012)</div>
-      <div class="vl">14 heartfelt outbursts</div>
+      <div class="nm">口吐芬芳<span class="tier">金</span><span class="tier hdt">隐藏</span></div>
+      <div class="ds">对 AI 爆了 10 次粗口。致敬 2012 年 Visual Studio 成就系统的 Potty Mouth</div>
+      <div class="vl">14 次真情流露</div>
     </div></div>
 <div class="card ok" style="--tc:#e8b339" onclick="pick(this)">
     <div class="plaque"><span class="ic">⏳</span></div>
     <div class="meta">
-      <div class="nm">Left on Read<span class="tier">Gold</span><span class="tier hdt">hidden</span></div>
-      <div class="ds">The AI answered, you vanished for 2+ hours, 5 times. It is not tired; you sleep first</div>
-      <div class="vl">88 times · longest ghost 35.6 days</div>
+      <div class="nm">已读不回<span class="tier">金</span><span class="tier hdt">隐藏</span></div>
+      <div class="ds">AI 答完干等你 2 小时起步，共 5 次。它不困，你先睡</div>
+      <div class="vl">共 88 次，最长晾了 35.6 天</div>
     </div></div></div>
-  <footer><span class="big">Every number comes from local logs. Nothing made up.</span><br>3 platforms connected (Claude Code + Codex + OpenClaw) · generated offline · your data never leaves this machine<br><span class="brand">🏆 <b>vibe-trophy</b> · github.com/maxi-max-dev/vibe-trophy</span></footer>
+  <footer><span class="big">数据全部来自本地真实日志，一条没编。</span><br>已接入 3 平台（Claude Code + Codex + OpenClaw）· 本地离线生成 · 数据不出这台电脑<br><span class="brand">🏆 <b>vibe-trophy</b> · github.com/maxi-max-dev/vibe-trophy</span></footer>
 </div>
 <script>
-const SHARE_TITLE = "🏆 My Vibecoding Achievements";
-const SHARE_SUB = "35 / 37 unlocked";
-const SHARE_HEAD = "🏆 My Vibecoding Achievements — 35 / 37 unlocked (straight from local logs)";
-const MORE_TXT = "…and {n} more";
-const COPIED_TXT = "✅ Copied";
-const STATS4 = [{"v":"2026-03-11","l":"Joined"},{"v":"1291","l":"Sessions"},{"v":"90","l":"Active days"},{"v":"14.5B","l":"Total tokens (incl. cache)"}];
-const SEP = ": ";
+const SHARE_TITLE = "🏆 我的 vibecoding 成就";
+const SHARE_SUB = "解锁 35 / 37";
+const SHARE_HEAD = "🏆 我的 vibecoding 成就 解锁 35 / 37（数据来自本地真实日志）";
+const MORE_TXT = "…还有 {n} 项";
+const COPIED_TXT = "✅ 已复制";
+const STATS4 = [{"v":"2026-03-11","l":"入坑日"},{"v":"1291","l":"会话"},{"v":"90","l":"活跃天"},{"v":"144.7 亿","l":"累计 token（含缓存）"}];
+const SEP = "：";
 const REPO_URL = 'github.com/maxi-max-dev/vibe-trophy';
 function pick(el) {
   if (document.body.classList.contains('share') || el.classList.contains('locked')) return;

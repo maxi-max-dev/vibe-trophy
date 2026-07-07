@@ -2,7 +2,7 @@
 
 从你本地的 AI 编程日志，算出你的 vibecoding 成就。
 
-👉 效果长这样（作者本人的真实成就墙）：https://maxi-max-dev.github.io/vibe-trophy/
+👉 效果长这样（作者本人的真实成就墙）：https://maxi-max-dev.github.io/vibe-trophy/demo.html
 
 别人的成就百分比是编的，这里的每个数字都来自你自己的真实日志。成就属于人，不属于某一个工具，所以它读的是你整个 vibe coding 生涯：
 
@@ -19,7 +19,11 @@
 
 ## 用法
 
-**最快（什么都不装）**：打开 [网页版](https://maxi-max-dev.github.io/vibe-trophy/try.html)，把 `~/.claude` 文件夹拖进去，浏览器本地算完直接出墙（数据不上传，断网也能用）。
+**最快（什么都不装）**：打开 [网页版](https://maxi-max-dev.github.io/vibe-trophy/)，把 `~/.claude` 文件夹拖进去，浏览器本地算完直接出墙（数据不上传，断网也能用）。
+
+**最偷懒（本来就在用 Claude Code / Codex）**：把这句话原样丢给它，剩下的它自己搞定：
+
+> 帮我跑一下 npx github:maxi-max-dev/vibe-trophy，跑完把生成的成就页在浏览器打开
 
 **命令行**：
 
@@ -27,7 +31,7 @@
 npx github:maxi-max-dev/vibe-trophy
 ```
 
-或者 clone 后 `node vibe-trophy.js`。跑完打开生成的 `index.html`。
+或者 clone 后 `node vibe-trophy.js`。跑完打开生成的 `index.html`（同目录附赠英文版 `en.html`）。
 
 可选参数：`--tz=Asia/Shanghai`（深夜成就按哪个时区算），`--out=index.html`（输出文件名），`--src=claude,codex,openclaw`（只统计指定平台）。
 
@@ -47,13 +51,13 @@ npx github:maxi-max-dev/vibe-trophy
 
 Steam-style achievements for your vibe coding, computed **locally** from your own AI-coding logs (Claude Code / Codex / OpenClaw adapters so far; anything with local logs can get one). Zero dependencies, fully offline, nothing leaves your machine, and the page contains only aggregate numbers, never message text or file paths.
 
-Fastest way — no install: open the [web version](https://maxi-max-dev.github.io/vibe-trophy/try.html) and drop your `~/.claude` folder in; everything is computed inside your browser. Or via CLI:
+Fastest way, no install: open the [web version](https://maxi-max-dev.github.io/vibe-trophy/) and drop your `~/.claude` folder in; everything is computed inside your browser. Laziest way: paste `Run npx github:maxi-max-dev/vibe-trophy and open the generated achievements page` into your Claude Code / Codex. Or by hand:
 
 ```bash
 npx github:maxi-max-dev/vibe-trophy
 ```
 
-37 achievements incl. hidden ones (one is a tribute to Visual Studio Achievements' Potty Mouth, 2012). Locked achievements show progress bars. Time-based achievements count human sessions only, cron-spawned agent sessions are excluded, so the grind is really yours. The [demo](https://maxi-max-dev.github.io/vibe-trophy/) is the author's own wall, straight from the logs.
+37 achievements incl. hidden ones (one is a tribute to Visual Studio Achievements' Potty Mouth, 2012). Locked achievements show progress bars. Time-based achievements count human sessions only, cron-spawned agent sessions are excluded, so the grind is really yours. The [demo](https://maxi-max-dev.github.io/vibe-trophy/demo.html) is the author's own wall, straight from the logs.
 
 ## 致谢
 

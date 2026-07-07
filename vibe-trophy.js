@@ -341,7 +341,7 @@ const UI = {
   },
   en: {
     lang: 'en', title: 'My Vibecoding Achievements', doc: 'My Vibecoding Achievements',
-    unlockedTxt: (u, t) => `${u} / ${t} unlocked`, share: 'Share mode', switchHref: 'index.html', switchTxt: '中',
+    unlockedTxt: (u, t) => `${u} / ${t} unlocked`, share: 'Share mode', switchHref: path.basename(OUT), switchTxt: '中',
     stats: ['Joined', 'Sessions', 'Active days', 'Total tokens (incl. cache)', 'Output tokens', 'Tool calls', 'Late nights'],
     srcsLine: (n, parts) => `🧩 <b>${n}</b> platforms connected: ${parts}`, sess: 'sessions',
     tip: 'Click cards to mark them for sharing; share mode shows only marked cards (default: gold & platinum).',
@@ -464,7 +464,7 @@ function render(L) {
 <div class="wrap">
   <div class="bar">
     <h1>🏆 ${L.title}<span class="sub">${L.unlockedTxt(unlocked.length, A.length)}</span></h1>
-    <div class="actions"><a class="lswitch try" href="try.html">${L.tryBtn}</a><a class="lswitch" href="${L.switchHref}">${L.switchTxt}</a><button id="copyBtn" onclick="copyStats()">${L.copyBtn}</button><button onclick="exportPng()">${L.exportBtn}</button><button onclick="toggleShare()">${L.share}</button></div>
+    <div class="actions"><a class="lswitch try" href="https://maxi-max-dev.github.io/vibe-trophy/">${L.tryBtn}</a><a class="lswitch" href="${L.switchHref}">${L.switchTxt}</a><button id="copyBtn" onclick="copyStats()">${L.copyBtn}</button><button onclick="exportPng()">${L.exportBtn}</button><button onclick="toggleShare()">${L.share}</button></div>
   </div>
   <div class="stats">
 ${sv.map((v, i) => `    <div class="st${i >= 4 ? ' hideShare' : ''}"><b>${v}</b><span>${L.stats[i]}</span></div>`).join('\n')}
