@@ -563,11 +563,38 @@ function copyStats() {
 </html>`;
 }
 
-fs.writeFileSync(OUT, render(UI.zh));
-const OUT_EN = path.join(path.dirname(OUT), 'en.html');
-fs.writeFileSync(OUT_EN, render(UI.en));
-console.log(`✅ ${OUT}`);
-console.log(`✅ ${OUT_EN} (English)`);
+// --json=path 只导出成就数据，不动 HTML（给外部系统喂数据用，例如成就墙/仪表盘）
+const JSON_OUT = arg('json', '');
+if (JSON_OUT) {
+  const payload = {
+    v: 1,
+    generated_at: new Date().toISOString(),
+    unlocked: unlocked.length,
+    total: A.length,
+    stats: {
+      sessions: S.sessions,
+      active_days: S.days.size,
+      total_tokens: totalTokens,
+      platforms: srcOn.map(b => ({ name: b.name, sessions: b.sessions, tokens: b.tokens })),
+    },
+    achievements: A.map(a => ({
+      g: a.g, icon: a.icon, name: a.name, name_en: a.nameEn, tier: a.tier,
+      desc: a.desc, desc_en: a.descEn, ok: !!a.ok,
+      cur: a.cur, max: a.max, val: a.val, val_en: a.valEn,
+      hidden: !!a.hidden,
+    })),
+  };
+  fs.writeFileSync(path.resolve(BASE, JSON_OUT), JSON.stringify(payload, null, 1));
+  console.log(`📦 ${path.resolve(BASE, JSON_OUT)}`);
+}
+
+if (!JSON_OUT || process.argv.some(x => x.startsWith('--out='))) {
+  fs.writeFileSync(OUT, render(UI.zh));
+  const OUT_EN = path.join(path.dirname(OUT), 'en.html');
+  fs.writeFileSync(OUT_EN, render(UI.en));
+  console.log(`✅ ${OUT}`);
+  console.log(`✅ ${OUT_EN} (English)`);
+}
 console.log(`平台: ${srcOn.map(b => `${b.name} ${b.sessions} 场/${yi(b.tokens)} token`).join(' · ')}`);
 console.log(`解锁 ${unlocked.length}/${A.length}`);
 for (const g of GROUPS) console.log(`  ${g}: ${A.filter(a => a.g === g).map(a => (a.ok ? a.icon : '🔒') + a.name).join(' ')}`);
