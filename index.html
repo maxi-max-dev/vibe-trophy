@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>vibe-trophy · 算算你的 vibecoding 成就</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🏆</text></svg>">
-<meta name="description" content="Steam 式成就系统 for vibe coding。从你本地的 AI 编程日志（Claude Code / Codex / OpenClaw）算出 37 个成就，浏览器本地计算，数据不上传。">
+<meta name="description" content="Steam 式成就系统 for vibe coding。从你本地的 AI 编程日志（Claude Code / Codex / OpenClaw）算出 41 个成就，浏览器本地计算，数据不上传。">
 <style>
   :root { color-scheme: dark; }
   * { box-sizing: border-box; margin: 0; }
@@ -66,8 +66,12 @@
   .drop .mut { font-size: 13px; color: #8a8f98; margin-top: 8px; }
   .privacy { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; margin-top: 18px; font-size: 12.5px; color: #8a8f98; }
   .privacy span { background: #1d2027; border: 1px solid #2a2e37; border-radius: 20px; padding: 5px 12px; }
-  .demolink { margin-top: 20px; font-size: 13.5px; }
-  .demolink a { color: #ffd76a; }
+  .peek { margin: 30px auto 0; max-width: 640px; }
+  .peek-t { font-size: 13.5px; font-weight: 700; color: #c8ccd2; margin-bottom: 12px; text-align: center; }
+  .peek-cards { display: flex; flex-direction: column; gap: 10px; text-align: left; }
+  .peek-cards .card { cursor: default; }
+  .peek-more { display: block; margin-top: 14px; text-align: center; background: linear-gradient(135deg, rgba(232,179,57,.13), rgba(232,179,57,.04)); border: 1px solid #6a5a35; color: #ffd76a; border-radius: 12px; padding: 12px 16px; font-size: 14px; font-weight: 700; text-decoration: none; transition: border-color .15s, background .15s; }
+  .peek-more:hover { border-color: #e8b339; background: rgba(232,179,57,.18); }
   .plats { margin-top: 14px; font-size: 12.5px; color: #6b7280; }
   .alt { margin: 26px auto 0; max-width: 640px; text-align: left; background: rgba(29,32,39,.35); border: 1px solid #262b34; border-radius: 16px; padding: 15px 18px 17px; }
   .alt-t { font-size: 13.5px; font-weight: 700; color: #c8ccd2; text-align: center; }
@@ -125,7 +129,36 @@
         <span data-s="pv1"></span><span data-s="pv2"></span><span data-s="pv3"></span>
       </div>
       <div class="plats" data-s="plats"></div>
-      <div class="demolink"><span data-s="demoPre"></span> <a id="demoA" href="demo.html" data-s="demoTxt"></a></div>
+      <div class="peek">
+        <div class="peek-t" data-s="peekT"></div>
+        <div class="peek-cards">
+          <div class="card ok" style="--tc:#e8b339">
+            <div class="plaque"><span class="ic">⏳</span></div>
+            <div class="meta">
+              <div class="nm"><span data-s="pk1n"></span><span class="tier" data-s="tGold"></span><span class="tier hdt" data-s="tHid"></span></div>
+              <div class="ds" data-s="pk1d"></div>
+              <div class="vl" data-s="pk1v"></div>
+            </div>
+          </div>
+          <div class="card ok plat" style="--tc:#7fd4d0">
+            <div class="plaque"><span class="ic">💯</span></div>
+            <div class="meta">
+              <div class="nm"><span data-s="pk2n"></span><span class="tier" data-s="tPlat"></span><span class="tier hdt" data-s="tHid"></span></div>
+              <div class="ds" data-s="pk2d"></div>
+              <div class="vl" data-s="pk2v"></div>
+            </div>
+          </div>
+          <div class="card ok" style="--tc:#e8b339">
+            <div class="plaque"><span class="ic">🤬</span></div>
+            <div class="meta">
+              <div class="nm"><span data-s="pk3n"></span><span class="tier" data-s="tGold"></span><span class="tier hdt" data-s="tHid"></span></div>
+              <div class="ds" data-s="pk3d"></div>
+              <div class="vl" data-s="pk3v"></div>
+            </div>
+          </div>
+        </div>
+        <a class="peek-more" id="demoA" href="demo.html" data-s="demoTxt"></a>
+      </div>
       <div class="alt">
         <div class="alt-t" data-s="altTitle"></div>
         <div class="alt-lab" data-s="alt1Lab"></div>
@@ -153,7 +186,12 @@ const STR = {
     dropBig: '📂 把你的 ~/.claude 文件夹拖进来', dropMut: '或点击选择文件夹 · 也支持 ~/.codex、~/.openclaw，一起拖更热闹',
     pv1: '🔒 数据不上传', pv2: '🧮 全程浏览器本地计算', pv3: '📴 断网也能用',
     plats: '已适配：Claude Code · Codex · OpenClaw（有本地日志的平台都能加）',
-    demoPre: '还没准备好？', demoTxt: '先看作者的真实成就墙 →',
+    peekT: '👀 成就长这样 · 来自作者的真实日志，一条没编',
+    tGold: '金', tPlat: '白金', tHid: '隐藏',
+    pk1n: '已读不回', pk1d: 'AI 答完干等你 2 小时起步。它不困，你先睡', pk1v: '共 97 次，最长晾了 35.6 天',
+    pk2n: '亿级玩家', pk2d: '单会话破 1 亿 token。致敬传说中 1.2 亿的那位', pk2v: '单会话纪录 21.8 亿',
+    pk3n: '口吐芬芳', pk3d: '对 AI 爆了 10 次粗口。致敬 2012 年 Visual Studio 的 Potty Mouth', pk3v: '23 次真情流露',
+    demoTxt: '围观作者的完整成就墙：解锁 37 / 41 →',
     reading: n => `📖 正在读日志… ${n} 个文件`, computing: '🧮 正在算你的成就…',
     none: '😅 没找到能识别的日志文件，确认拖的是 ~/.claude（或 ~/.codex、~/.openclaw）文件夹',
     unlocked: (u, t) => `解锁 ${u} / ${t}`, share: '晒图模式', exportBtn: '导出图片', copyBtn: '复制战绩', copied: '✅ 已复制', again: '换个文件夹',
@@ -179,7 +217,12 @@ const STR = {
     dropBig: '📂 Drop your ~/.claude folder here', dropMut: 'or click to pick a folder · ~/.codex and ~/.openclaw welcome too',
     pv1: '🔒 Nothing is uploaded', pv2: '🧮 Computed entirely in your browser', pv3: '📴 Works offline',
     plats: 'Supported: Claude Code · Codex · OpenClaw (anything with local logs can be added)',
-    demoPre: 'Not ready yet?', demoTxt: 'See the author\'s real wall first →',
+    peekT: '👀 What you get · from the author\'s real logs, nothing made up',
+    tGold: 'Gold', tPlat: 'Platinum', tHid: 'hidden',
+    pk1n: 'Left on Read', pk1d: 'The AI answered; you vanished for 2+ hours. It is not tired; you sleep first', pk1v: '97 times · longest ghost 35.6 days',
+    pk2n: 'Hundred-Million Club', pk2d: '100M+ tokens in one session. Tribute to the legendary 120M guy', pk2v: 'Record 2.2B in one session',
+    pk3n: 'Potty Mouth', pk3d: 'Swore at the AI 10 times. A tribute to Visual Studio Achievements (2012)', pk3v: '23 heartfelt outbursts',
+    demoTxt: 'See the author\'s full wall: 37 / 41 unlocked →',
     reading: n => `📖 Reading logs… ${n} files`, computing: '🧮 Computing your achievements…',
     none: '😅 No recognizable logs found. Make sure you dropped ~/.claude (or ~/.codex, ~/.openclaw)',
     unlocked: (u, t) => `${u} / ${t} unlocked`, share: 'Share mode', exportBtn: 'Export PNG', copyBtn: 'Copy stats', copied: '✅ Copied', again: 'Pick another folder',
@@ -315,6 +358,7 @@ async function processFiles(files) {
     askCalls: 0, gitCommits: 0, images: 0, interrupts: 0, compacts: 0,
     longPrompts: 0, maxPromptLen: 0, models: new Set(),
     thanks: 0, swears: 0, tiny: 0, repeats: 0, urls: 0, waits: 0, maxWait: 0,
+    sorrys: 0, zaima: 0, loneQ: 0, clears: 0,
     lunch: new Set(), dinner: new Set(),
     projects: new Set(), longestRun: 0, maxBurst: 0, daySpan: {}, hourSessions: {}, daySessions: {},
     limitHit: false, firstTs: Infinity, bySrc: {},
@@ -371,11 +415,15 @@ async function processFiles(files) {
         const t = o.typed, len = t.length;
         burst = 0;
         if (/^\[cron:/.test(t)) fileAuto = true;
+        if (/<command-name>\/clear/.test(t)) S.clears++;
         if (!/^[<\[]/.test(t) && !/<command-|<local-command|<system-reminder/.test(t)) {
           if (len > S.maxPromptLen) S.maxPromptLen = len;
           if (len >= 500) S.longPrompts++;
           if (/谢谢|辛苦了|thank/i.test(t)) S.thanks++;
           if (/卧槽|我靠|妈的|他妈|tmd|艹|fuck|shit|wtf/i.test(t)) S.swears++;
+          if (/对不起|抱歉|我错了|my bad|sorry|apolog/i.test(t)) S.sorrys++;
+          if (/^(在吗|在不在|在么|你在吗|you there|u there)[\s?？!！。.~～]*$/i.test(t)) S.zaima++;
+          if (/^[?？]{1,3}$/.test(t)) S.loneQ++;
           if (len <= 2) S.tiny++;
           if (/https?:\/\//.test(t)) S.urls++;
           if (t === prevTyped && len >= 2) S.repeats++;
@@ -444,15 +492,16 @@ function buildA(S) {
   const hEn = h => Math.floor(h) + 'h ' + Math.round(h % 1 * 60) + 'm';
   const A = [
     { g: 'g1', icon: '👋', name: 'Hello World', nameEn: 'Hello World', tier: 't1', desc: '第一次打开 AI 编程工具，从此再没亲手写过代码', descEn: 'Opened an AI coding tool once; never hand-wrote code again', cur: S.sessions, max: 1, val: '入坑于 ' + join, valEn: 'Joined ' + join },
-    { g: 'g1', icon: '🧩', name: '跨栈玩家', nameEn: 'Cross-Stack Player', tier: 't3', desc: '同时驯服 2 个以上 AI 编程平台，鸡蛋不放一个篮子', descEn: 'Taming 2+ AI coding platforms at once', cur: srcOn.length, max: 2, val: srcOn.length + ' 个平台：' + srcNames, valEn: srcOn.length + ' platforms: ' + srcNames },
+    { g: 'g1', icon: '🧩', name: '跨栈玩家', nameEn: 'Cross-Stack Player', tier: 't3', desc: '同时驯服 2 个以上 AI 编程平台，哪家额度没烧完，今晚就翻谁的牌子', descEn: 'Taming 2+ AI coding platforms; whichever has quota left gets picked tonight', cur: srcOn.length, max: 2, val: srcOn.length + ' 个平台：' + srcNames, valEn: srcOn.length + ' platforms: ' + srcNames },
     { g: 'g1', icon: '🛸', name: '全栈指挥官', nameEn: 'Fleet Commander', tier: 't4', hidden: true, desc: '3 个平台同时在册，你不是用户，你是舰队司令', descEn: '3+ platforms enlisted. You are an admiral', cur: srcOn.length, max: 3, val: '舰队编制：' + srcNames, valEn: 'Fleet: ' + srcNames },
     { g: 'g1', icon: '🗺️', name: '项目海王', nameEn: 'Repo Casanova', tier: 't2', desc: '同时撩 10 个以上项目，每一个都说过"这是主线"', descEn: 'Juggling 10+ projects, each one "the main one"', cur: S.projects.size, max: 10, val: S.projects.size + ' 个项目', valEn: S.projects.size + ' project folders' },
-    { g: 'g1', icon: '🧰', name: '装备党', nameEn: 'Gear Head', tier: 't2', desc: 'MCP 工具调用 500 次，工具比活儿多', descEn: '500 MCP tool calls; more tools than tasks', cur: S.mcpCalls, max: 500, val: S.mcpCalls + ' 次 MCP 调用', valEn: S.mcpCalls + ' MCP calls' },
-    { g: 'g1', icon: '🖼️', name: '一图胜千言', nameEn: 'Screenshot Diplomat', tier: 't1', desc: '截图一甩："就照这个做"，累计 10 张', descEn: '"Just make it look like this" — 10 screenshots', cur: S.images, max: 10, val: '甩过 ' + S.images + ' 张图', valEn: S.images + ' images thrown' },
+    { g: 'g1', icon: '🧰', name: '装备党', nameEn: 'Gear Head', tier: 't2', desc: 'MCP 调用 500 次。工欲善其事，必先装一堆 MCP', descEn: '500 MCP calls. A craftsman first sharpens his tools — by installing more tools', cur: S.mcpCalls, max: 500, val: S.mcpCalls + ' 次 MCP 调用', valEn: S.mcpCalls + ' MCP calls' },
+    { g: 'g1', icon: '🖼️', name: '一图胜千言', nameEn: 'Screenshot Diplomat', tier: 't1', desc: '甩过 10 张截图："就照这个做"。截图就是需求文档，需求文档就是截图', descEn: '10 screenshots thrown: "make it look like this." The screenshot IS the spec', cur: S.images, max: 10, val: '甩过 ' + S.images + ' 张图', valEn: S.images + ' images thrown' },
     { g: 'g1', icon: '📚', name: '提示词小说家', nameEn: 'Prompt Novelist', tier: 't2', desc: '单条消息 500 字起步，这不是 prompt 是需求文档', descEn: '500+ chars in one message; that is a spec', cur: S.longPrompts, max: 1, val: '最长一条 ' + S.maxPromptLen + ' 字，超500字共 ' + S.longPrompts + ' 条', valEn: 'Longest ' + S.maxPromptLen + ' chars · ' + S.longPrompts + ' over 500' },
     { g: 'g1', icon: '🤏', name: '一字千金', nameEn: 'Man of Few Words', tier: 't2', desc: '两个字以内的指令发了 20 条，"继续"就是最强 prompt', descEn: '20 commands of two characters or less', cur: S.tiny, max: 20, val: S.tiny + ' 条极简指令', valEn: S.tiny + ' micro-commands' },
     { g: 'g1', icon: '🔂', name: '复读机', nameEn: 'Broken Record', tier: 't1', desc: '一字不差把同一句话再发一遍，共 5 次', descEn: 'Re-sent the exact same message, 5 times', cur: S.repeats, max: 5, val: S.repeats + ' 次原句重发', valEn: S.repeats + ' exact re-sends' },
     { g: 'g1', icon: '🧭', name: '导航员', nameEn: 'Link Dealer', tier: 't1', desc: '甩了 50 个链接过去："你自己去看"', descEn: 'Threw 50 URLs: "see for yourself"', cur: S.urls, max: 50, val: S.urls + ' 条带链接消息', valEn: S.urls + ' messages with links' },
+    { g: 'g1', icon: '🫥', name: '在吗', nameEn: 'You There?', tier: 't1', hidden: true, desc: '对一个 24 小时待机的 AI 说"在吗"，共 3 次。它一直都在，它哪儿也去不了', descEn: 'Asked a 24/7 AI "you there?" 3 times. It never left. It literally cannot leave', cur: S.zaima, max: 3, val: S.zaima + ' 次查岗', valEn: S.zaima + ' wellness checks' },
     { g: 'g1', icon: '🪞', name: '元成就', nameEn: 'Meta Achievement', tier: 't1', hidden: true, desc: '用一个成就系统，围观自己的成就', descEn: 'Using an achievement system to admire your achievements', cur: 1, max: 1, val: '你正在看它', valEn: "You're looking at it" },
     { g: 'g2', icon: '🌙', name: '凌晨三点俱乐部', nameEn: '3 AM Club', tier: 't2', desc: '02:00–06:00 还在 vibe，全世界只剩你和它的 loading', descEn: 'Vibing between 2 and 6 AM', cur: S.nightDays.size, max: 1, val: S.nightDays.size + ' 个深夜', valEn: S.nightDays.size + ' late nights' },
     { g: 'g2', icon: '🧛', name: '吸血鬼作息', nameEn: 'Vampire Schedule', tier: 't3', desc: '连续 3 天深夜营业，太阳升起前必须收工', descEn: '3 nights in a row', cur: vampStreak, max: 3, val: '连续 ' + vampStreak + ' 天深夜在线', valEn: vampStreak + ' consecutive late nights' },
@@ -463,8 +512,8 @@ function buildA(S) {
     { g: 'g2', icon: '🗓️', name: '日理万机', nameEn: 'Overbooked', tier: 't3', desc: '单日开 15 场会话，每个窗口都在"快好了"', descEn: '15 sessions in one day', cur: maxDayS, max: 15, val: '单日最多 ' + maxDayS + ' 场', valEn: 'Up to ' + maxDayS + ' sessions a day' },
     { g: 'g2', icon: '🎪', name: '多线程人格', nameEn: 'Multithreaded Personality', tier: 't3', desc: '同一小时 3 路会话并行：左手报错，右手"你说得对"', descEn: '3 sessions in the same hour', cur: maxPara, max: 3, val: '最高并行 ' + maxPara + ' 路', valEn: maxPara + ' sessions in parallel' },
     { g: 'g2', icon: '🔁', name: '我又回来了', nameEn: 'Back Again', tier: 't1', hidden: true, desc: '戒了 7 天，还是回来了', descEn: 'Quit for 7 days. Came back anyway', cur: comeback ? 1 : 0, max: 1, val: '欢迎回家', valEn: 'Welcome home' },
-    { g: 'g2', icon: '🍜', name: '饭点不存在', nameEn: 'Meals Are Optional', tier: 't2', desc: '午饭点和晚饭点都在线，共 10 天', descEn: 'Online at both lunch and dinner, 10 days', cur: mealBoth, max: 10, val: mealBoth + ' 天午晚连线', valEn: mealBoth + ' days lunch + dinner' },
-    { g: 'g2', icon: '🌤️', name: '周末战士', nameEn: 'Weekend Warrior', tier: 't1', desc: '周六周日也在线 10 天，双休是不存在的', descEn: 'Online on 10 weekend days', cur: wknd, max: 10, val: '周末上线 ' + wknd + ' 天', valEn: wknd + ' weekend days online' },
+    { g: 'g2', icon: '🍜', name: '饭点不存在', nameEn: 'Meals Are Optional', tier: 't2', desc: '午饭点和晚饭点都在线，共 10 天。外卖在门口凉透，代码在锅里翻滚', descEn: 'Online through lunch AND dinner, 10 days. The takeout went cold at the door', cur: mealBoth, max: 10, val: mealBoth + ' 天午晚连线', valEn: mealBoth + ' days lunch + dinner' },
+    { g: 'g2', icon: '🌤️', name: '周末战士', nameEn: 'Weekend Warrior', tier: 't1', desc: '周六周日也在线 10 天。「双休」这个功能，在你这儿 v0.1 就被砍了', descEn: '10 weekend days online. Weekends: a feature you deprecated in v0.1', cur: wknd, max: 10, val: '周末上线 ' + wknd + ' 天', valEn: wknd + ' weekend days online' },
     { g: 'g3', icon: '🔥', name: '烧 token 大户', nameEn: 'Token Furnace', tier: 't3', desc: '单次会话烧掉 5000 万 token，电表都没你转得快', descEn: '50M+ tokens in one session', cur: S.maxSessionTokens, max: 5e7, val: '单会话纪录 ' + yi(S.maxSessionTokens), valEn: 'Record ' + yiEn(S.maxSessionTokens) + ' in one session', fmt: yi, fmtEn: yiEn },
     { g: 'g3', icon: '💯', name: '亿级玩家', nameEn: 'Hundred-Million Club', tier: 't4', hidden: true, desc: '单会话破 1 亿 token。致敬传说中 1.2 亿的那位', descEn: '100M+ tokens in one session', cur: S.maxSessionTokens, max: 1e8, val: '单会话纪录 ' + yi(S.maxSessionTokens), valEn: 'Record ' + yiEn(S.maxSessionTokens), fmt: yi, fmtEn: yiEn },
     { g: 'g3', icon: '🐷', name: '缓存白嫖怪', nameEn: 'Cache Freeloader', tier: 't3', desc: '缓存命中累计 10 亿 token，省下的都是赚的', descEn: '1B+ cached tokens', cur: S.tokens.cr, max: 1e9, val: '白嫖 ' + yi(S.tokens.cr), valEn: yiEn(S.tokens.cr) + ' freeloaded', fmt: yi, fmtEn: yiEn },
@@ -472,11 +521,14 @@ function buildA(S) {
     { g: 'g4', icon: '🏗️', name: '包工头', nameEn: 'The Foreman', tier: 't3', desc: '派出 100 个子代理，精通自己不干活的艺术', descEn: '100 subagents dispatched', cur: S.taskCalls, max: 100, val: '已派 ' + S.taskCalls + ' 个分身', valEn: S.taskCalls + ' clones dispatched' },
     { g: 'g4', icon: '🧨', name: '一句话工程', nameEn: 'One-Prompt Wonder', tier: 't3', desc: '一条指令，AI 连打 50 个工具调用不带喘', descEn: 'One instruction, 50+ tool calls', cur: S.maxBurst, max: 50, val: '最长连击 ' + S.maxBurst, valEn: 'Longest combo ' + S.maxBurst },
     { g: 'g4', icon: '🫡', name: '你说得对学派', nameEn: '"You\'re Absolutely Right"', tier: 't2', desc: '被 AI 说过 50 次"你说得对"，而你确实说得对', descEn: 'Heard it 50 times. And you were', cur: S.saidRight, max: 50, val: S.saidRight + ' 次', valEn: S.saidRight + ' times' },
+    { g: 'g4', icon: '❓', name: '灵魂拷问', nameEn: 'The Lone "?"', tier: 't2', desc: '单发一个"？"，共 5 次。一个字都懒得多打，出了什么事它自己心里有数', descEn: 'Sent a lone "?" 5 times. One character; it knows what it did', cur: S.loneQ, max: 5, val: S.loneQ + ' 记灵魂拷问', valEn: S.loneQ + ' lone question marks' },
     { g: 'g4', icon: '🛑', name: '刹车侠', nameEn: 'Emergency Brake', tier: 't2', desc: '按 20 次 Esc 打断输出。刹车是最后的尊严', descEn: '20 Esc presses', cur: S.interrupts, max: 20, val: '踩了 ' + S.interrupts + ' 脚刹车', valEn: S.interrupts + ' brakes' },
     { g: 'g4', icon: '🚢', name: 'Ship 机器', nameEn: 'Ship Machine', tier: 't3', desc: '经手 100 个 commit，信息还都写得比你好', descEn: '100 commits, better messages than yours', cur: S.gitCommits, max: 100, val: S.gitCommits + ' 个 commit', valEn: S.gitCommits + ' commits' },
     { g: 'g4', icon: '💥', name: '上下文爆破手', nameEn: 'Context Bomber', tier: 't2', desc: '把对话聊到失忆 10 次，compact 是一种境界', descEn: 'Talked the AI into amnesia 10 times', cur: S.compacts, max: 10, val: S.compacts + ' 次失忆', valEn: S.compacts + ' blackouts' },
+    { g: 'g4', icon: '🧹', name: '重开侠', nameEn: 'Clean Slate', tier: 't2', desc: '/clear 了 20 次。聊崩的对话不用修，重开就好，你不欠历史一个解释', descEn: 'Hit /clear 20 times. A broken chat is not fixed, it is reborn', cur: S.clears, max: 20, val: S.clears + ' 次从头再来', valEn: S.clears + ' fresh starts' },
     { g: 'g4', icon: '🎰', name: '全家桶收集者', nameEn: 'Model Collector', tier: 't2', desc: '用过 3 种以上模型：有的干活，有的跑腿，有的背锅', descEn: '3+ models collected', cur: S.models.size, max: 3, val: S.models.size + ' 种模型', valEn: S.models.size + ' models' },
-    { g: 'g4', icon: '🙋', name: '甲方本人', nameEn: 'The Client', tier: 't1', desc: '被 AI 反过来追问 20 次需求，这就是话语权', descEn: 'The AI asked YOU for requirements 20 times', cur: S.askCalls, max: 20, val: '被追问 ' + S.askCalls + ' 次', valEn: 'Asked ' + S.askCalls + ' times' },
+    { g: 'g4', icon: '🙋', name: '甲方本人', nameEn: 'The Client', tier: 't1', desc: '被 AI 反过来追问 20 次需求。谁写 PRD？不存在的，它猜不动了自然会问', descEn: 'The AI asked YOU to clarify 20 times. PRD? It asks when guessing fails', cur: S.askCalls, max: 20, val: '被追问 ' + S.askCalls + ' 次', valEn: 'Asked ' + S.askCalls + ' times' },
+    { g: 'g4', icon: '🙇', name: '我错了', nameEn: 'My Bad', tier: 't1', desc: '对 AI 说过 5 次对不起。它不需要道歉，但你需要这个仪式', descEn: "Apologized to the AI 5 times. It doesn't need it; you need the closure", cur: S.sorrys, max: 5, val: S.sorrys + ' 次道歉', valEn: S.sorrys + ' apologies' },
     { g: 'g4', icon: '🙏', name: '人机礼仪模范', nameEn: 'Politeness Award', tier: 't1', desc: '对 AI 说了 20 次谢谢。它记不住，但你是好人', descEn: 'Said thanks 20 times', cur: S.thanks, max: 20, val: S.thanks + ' 次感谢', valEn: S.thanks + ' thanks' },
     { g: 'g4', icon: '🤬', name: '口吐芬芳', nameEn: 'Potty Mouth', tier: 't3', hidden: true, desc: '对 AI 爆了 10 次粗口。致敬 2012 年 Visual Studio 成就系统的 Potty Mouth', descEn: 'Swore at the AI 10 times. A tribute to Visual Studio Achievements (2012)', cur: S.swears, max: 10, val: S.swears + ' 次真情流露', valEn: S.swears + ' heartfelt outbursts' },
     { g: 'g4', icon: '⏳', name: '已读不回', nameEn: 'Left on Read', tier: 't3', hidden: true, desc: 'AI 答完干等你 2 小时起步，共 5 次。它不困，你先睡', descEn: 'The AI answered, you vanished for 2+ hours, 5 times', cur: S.waits, max: 5, val: '共 ' + S.waits + ' 次，最长晾了 ' + (S.maxWait >= 48 * 36e5 ? (S.maxWait / 864e5).toFixed(1) + ' 天' : (S.maxWait / 36e5).toFixed(1) + ' 小时'), valEn: S.waits + ' times · longest ghost ' + (S.maxWait >= 48 * 36e5 ? (S.maxWait / 864e5).toFixed(1) + ' days' : (S.maxWait / 36e5).toFixed(1) + 'h') },

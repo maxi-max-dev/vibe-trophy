@@ -37,7 +37,7 @@ npx github:maxi-max-dev/vibe-trophy
 
 ## 有什么
 
-- 37 个成就，四组：🌱 日常 / 🌙 肝度 / 💸 钞能力 / 🎮 微操，含 8 个隐藏成就（其中一个致敬 2012 年 Visual Studio Achievements 的 Potty Mouth）
+- 41 个成就，四组：🌱 日常 / 🌙 肝度 / 💸 钞能力 / 🎮 微操，含 9 个隐藏成就（其中一个致敬 2012 年 Visual Studio Achievements 的 Potty Mouth）
 - 跨平台成就：同时驯服多个 AI 编程工具的人有专属奖杯
 - 未解锁的显示进度条（差多少一目了然）
 - 晒图模式：点卡片选中想晒的，一键切竖版，未解锁和敏感统计自动隐藏
@@ -57,7 +57,7 @@ Fastest way, no install: open the [web version](https://maxi-max-dev.github.io/v
 npx github:maxi-max-dev/vibe-trophy
 ```
 
-37 achievements incl. hidden ones (one is a tribute to Visual Studio Achievements' Potty Mouth, 2012). Locked achievements show progress bars. Time-based achievements count human sessions only, cron-spawned agent sessions are excluded, so the grind is really yours. The [demo](https://maxi-max-dev.github.io/vibe-trophy/demo.html) is the author's own wall, straight from the logs.
+41 achievements incl. hidden ones (one is a tribute to Visual Studio Achievements' Potty Mouth, 2012). Locked achievements show progress bars. Time-based achievements count human sessions only, cron-spawned agent sessions are excluded, so the grind is really yours. The [demo](https://maxi-max-dev.github.io/vibe-trophy/demo.html) is the author's own wall, straight from the logs.
 
 ## 致谢
 

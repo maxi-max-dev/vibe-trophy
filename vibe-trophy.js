@@ -132,6 +132,7 @@ const S = {
   askCalls: 0, gitCommits: 0, images: 0, interrupts: 0, compacts: 0,
   longPrompts: 0, maxPromptLen: 0, models: new Map(),
   thanks: 0, swears: 0, tiny: 0, repeats: 0, urls: 0, waits: 0, maxWait: 0,
+  sorrys: 0, zaima: 0, loneQ: 0, clears: 0,
   lunch: new Set(), dinner: new Set(),
   projects: new Set(), longestRun: 0, maxBurst: 0, daySpan: {}, hourSessions: {}, daySessions: {},
   limitHit: false, firstTs: Infinity, lastTs: 0, bySrc: {},
@@ -197,12 +198,16 @@ for (const src of active) {
         S.msgs++;
         burst = 0; // 真人开口，连击重计
         if (/^\[cron:/.test(typedText)) fileAuto = true; // cron 拉起的会话，不算人肝的
+        if (/<command-name>\/clear/.test(typedText)) S.clears++; // /clear 是斜杠命令，得在风格过滤前抓
         // 风格统计：跳过工具/系统/cron 注入的消息（<tag> 或 [xxx] 开头）
         if (!/^[<\[]/.test(typedText) && !/<command-|<local-command|<system-reminder/.test(typedText)) {
           if (typedLen > S.maxPromptLen) S.maxPromptLen = typedLen;
           if (typedLen >= 500) S.longPrompts++;
           if (/谢谢|辛苦了|thank/i.test(typedText)) S.thanks++;
           if (/卧槽|我靠|妈的|他妈|tmd|艹|fuck|shit|wtf/i.test(typedText)) S.swears++;
+          if (/对不起|抱歉|我错了|my bad|sorry|apolog/i.test(typedText)) S.sorrys++;
+          if (/^(在吗|在不在|在么|你在吗|you there|u there)[\s?？!！。.~～]*$/i.test(typedText)) S.zaima++;
+          if (/^[?？]{1,3}$/.test(typedText)) S.loneQ++;
           if (typedLen <= 2) S.tiny++;
           if (/https?:\/\//.test(typedText)) S.urls++;
           if (typedText === prevTyped && typedLen >= 2) S.repeats++;
@@ -278,15 +283,16 @@ const joinDate = isFinite(S.firstTs) ? local(S.firstTs).date : '?';
 const A = [
   // 🌱 日常 Daily
   { g: '日常', icon: '👋', name: 'Hello World', nameEn: 'Hello World', tier: '铜', desc: '第一次打开 AI 编程工具，从此再没亲手写过代码', descEn: 'Opened an AI coding tool once; never hand-wrote code again', cur: S.sessions, max: 1, val: `入坑于 ${joinDate}`, valEn: `Joined ${joinDate}` },
-  { g: '日常', icon: '🧩', name: '跨栈玩家', nameEn: 'Cross-Stack Player', tier: '金', desc: '同时驯服 2 个以上 AI 编程平台，鸡蛋不放一个篮子', descEn: 'Taming 2+ AI coding platforms at once; eggs, many baskets', cur: srcOn.length, max: 2, val: `${srcOn.length} 个平台：${srcNames}`, valEn: `${srcOn.length} platforms: ${srcNames}` },
+  { g: '日常', icon: '🧩', name: '跨栈玩家', nameEn: 'Cross-Stack Player', tier: '金', desc: '同时驯服 2 个以上 AI 编程平台，哪家额度没烧完，今晚就翻谁的牌子', descEn: 'Taming 2+ AI coding platforms; whichever has quota left gets picked tonight', cur: srcOn.length, max: 2, val: `${srcOn.length} 个平台：${srcNames}`, valEn: `${srcOn.length} platforms: ${srcNames}` },
   { g: '日常', icon: '🛸', name: '全栈指挥官', nameEn: 'Fleet Commander', tier: '白金', hidden: true, desc: '3 个平台同时在册，你不是用户，你是舰队司令', descEn: '3+ platforms enlisted. You are not a user, you are an admiral', cur: srcOn.length, max: 3, val: `舰队编制：${srcNames}`, valEn: `Fleet: ${srcNames}` },
   { g: '日常', icon: '🗺️', name: '项目海王', nameEn: 'Repo Casanova', tier: '银', desc: '同时撩 10 个以上项目，每一个都说过"这是主线"', descEn: 'Juggling 10+ projects, each one sworn to be "the main one"', cur: S.projects.size, max: 10, val: `${S.projects.size} 个项目`, valEn: `${S.projects.size} project folders` },
-  { g: '日常', icon: '🧰', name: '装备党', nameEn: 'Gear Head', tier: '银', desc: 'MCP 工具调用 500 次，工具比活儿多', descEn: '500 MCP tool calls; more tools than tasks', cur: S.mcpCalls, max: 500, val: `${S.mcpCalls} 次 MCP 调用`, valEn: `${S.mcpCalls} MCP calls` },
-  { g: '日常', icon: '🖼️', name: '一图胜千言', nameEn: 'Screenshot Diplomat', tier: '铜', desc: '截图一甩："就照这个做"，累计 10 张', descEn: '"Just make it look like this" — 10 screenshots thrown', cur: S.images, max: 10, val: `甩过 ${S.images} 张图`, valEn: `${S.images} images thrown` },
+  { g: '日常', icon: '🧰', name: '装备党', nameEn: 'Gear Head', tier: '银', desc: 'MCP 调用 500 次。工欲善其事，必先装一堆 MCP', descEn: '500 MCP calls. A craftsman first sharpens his tools — by installing more tools', cur: S.mcpCalls, max: 500, val: `${S.mcpCalls} 次 MCP 调用`, valEn: `${S.mcpCalls} MCP calls` },
+  { g: '日常', icon: '🖼️', name: '一图胜千言', nameEn: 'Screenshot Diplomat', tier: '铜', desc: '甩过 10 张截图："就照这个做"。截图就是需求文档，需求文档就是截图', descEn: '10 screenshots thrown: "make it look like this." The screenshot IS the spec', cur: S.images, max: 10, val: `甩过 ${S.images} 张图`, valEn: `${S.images} images thrown` },
   { g: '日常', icon: '📚', name: '提示词小说家', nameEn: 'Prompt Novelist', tier: '银', desc: '单条消息 500 字起步，这不是 prompt 是需求文档', descEn: '500+ chars in one message; that is not a prompt, that is a spec', cur: S.longPrompts, max: 1, val: `最长一条 ${S.maxPromptLen} 字，超500字共 ${S.longPrompts} 条`, valEn: `Longest ${S.maxPromptLen} chars · ${S.longPrompts} over 500` },
   { g: '日常', icon: '🤏', name: '一字千金', nameEn: 'Man of Few Words', tier: '银', desc: '两个字以内的指令发了 20 条，"继续"就是最强 prompt', descEn: '20 commands of two characters or less; "go" is the strongest prompt', cur: S.tiny, max: 20, val: `${S.tiny} 条极简指令`, valEn: `${S.tiny} micro-commands` },
   { g: '日常', icon: '🔂', name: '复读机', nameEn: 'Broken Record', tier: '铜', desc: '一字不差把同一句话再发一遍，共 5 次。再试一次，再试亿次', descEn: 'Re-sent the exact same message, 5 times. Try again. Try a-gain', cur: S.repeats, max: 5, val: `${S.repeats} 次原句重发`, valEn: `${S.repeats} exact re-sends` },
   { g: '日常', icon: '🧭', name: '导航员', nameEn: 'Link Dealer', tier: '铜', desc: '甩了 50 个链接过去："你自己去看"', descEn: 'Threw 50 URLs: "see for yourself"', cur: S.urls, max: 50, val: `${S.urls} 条带链接消息`, valEn: `${S.urls} messages with links` },
+  { g: '日常', icon: '🫥', name: '在吗', nameEn: 'You There?', tier: '铜', hidden: true, desc: '对一个 24 小时待机的 AI 说"在吗"，共 3 次。它一直都在，它哪儿也去不了', descEn: 'Asked a 24/7 AI "you there?" 3 times. It never left. It literally cannot leave', cur: S.zaima, max: 3, val: `${S.zaima} 次查岗`, valEn: `${S.zaima} wellness checks` },
   { g: '日常', icon: '🪞', name: '元成就', nameEn: 'Meta Achievement', tier: '铜', hidden: true, desc: '用一个成就系统，围观自己的成就', descEn: 'Using an achievement system to admire your achievements', cur: 1, max: 1, val: '你正在看它', valEn: "You're looking at it" },
   // 🌙 肝度 Grind
   { g: '肝度', icon: '🌙', name: '凌晨三点俱乐部', nameEn: '3 AM Club', tier: '银', desc: '02:00–06:00 还在 vibe，全世界只剩你和它的 loading', descEn: 'Vibing between 2 and 6 AM; the world is just you and a loading spinner', cur: S.nightDays.size, max: 1, val: `${S.nightDays.size} 个深夜`, valEn: `${S.nightDays.size} late nights` },
@@ -298,8 +304,8 @@ const A = [
   { g: '肝度', icon: '🗓️', name: '日理万机', nameEn: 'Overbooked', tier: '金', desc: '单日开 15 场会话，每个窗口都在"快好了"', descEn: '15 sessions in one day, every window "almost done"', cur: maxDayS, max: 15, val: `单日最多 ${maxDayS} 场`, valEn: `Up to ${maxDayS} sessions a day` },
   { g: '肝度', icon: '🎪', name: '多线程人格', nameEn: 'Multithreaded Personality', tier: '金', desc: '同一小时 3 路会话并行：左手报错，右手"你说得对"', descEn: '3 sessions in the same hour: errors on the left, "absolutely right" on the right', cur: maxPara, max: 3, val: `最高并行 ${maxPara} 路`, valEn: `${maxPara} sessions in parallel` },
   { g: '肝度', icon: '🔁', name: '我又回来了', nameEn: 'Back Again', tier: '铜', hidden: true, desc: '戒了 7 天，还是回来了', descEn: 'Quit for 7 days. Came back anyway', cur: comeback ? 1 : 0, max: 1, val: '欢迎回家', valEn: 'Welcome home' },
-  { g: '肝度', icon: '🍜', name: '饭点不存在', nameEn: 'Meals Are Optional', tier: '银', desc: '午饭点和晚饭点都在线，共 10 天。干饭不如干活', descEn: 'Online at both lunch and dinner, 10 days', cur: mealBoth, max: 10, val: `${mealBoth} 天午晚连线`, valEn: `${mealBoth} days lunch + dinner online` },
-  { g: '肝度', icon: '🌤️', name: '周末战士', nameEn: 'Weekend Warrior', tier: '铜', desc: '周六周日也在线 10 天，双休是不存在的', descEn: 'Online on 10 weekend days; weekends are a myth', cur: wknd, max: 10, val: `周末上线 ${wknd} 天`, valEn: `${wknd} weekend days online` },
+  { g: '肝度', icon: '🍜', name: '饭点不存在', nameEn: 'Meals Are Optional', tier: '银', desc: '午饭点和晚饭点都在线，共 10 天。外卖在门口凉透，代码在锅里翻滚', descEn: 'Online through lunch AND dinner, 10 days. The takeout went cold at the door', cur: mealBoth, max: 10, val: `${mealBoth} 天午晚连线`, valEn: `${mealBoth} days lunch + dinner online` },
+  { g: '肝度', icon: '🌤️', name: '周末战士', nameEn: 'Weekend Warrior', tier: '铜', desc: '周六周日也在线 10 天。「双休」这个功能，在你这儿 v0.1 就被砍了', descEn: '10 weekend days online. Weekends: a feature you deprecated in v0.1', cur: wknd, max: 10, val: `周末上线 ${wknd} 天`, valEn: `${wknd} weekend days online` },
   // 💸 钞能力 Cash Burn
   { g: '钞能力', icon: '🔥', name: '烧 token 大户', nameEn: 'Token Furnace', tier: '金', desc: '单次会话烧掉 5000 万 token，电表都没你转得快', descEn: '50M+ tokens in one session; faster than your power meter', cur: S.maxSessionTokens, max: 5e7, val: `单会话纪录 ${yi(S.maxSessionTokens)}`, valEn: `Record ${yiEn(S.maxSessionTokens)} in one session`, fmt: yi, fmtEn: yiEn },
   { g: '钞能力', icon: '💯', name: '亿级玩家', nameEn: 'Hundred-Million Club', tier: '白金', hidden: true, desc: '单会话破 1 亿 token。致敬传说中 1.2 亿的那位', descEn: '100M+ tokens in one session. Tribute to the legendary 120M guy', cur: S.maxSessionTokens, max: 1e8, val: `单会话纪录 ${yi(S.maxSessionTokens)}`, valEn: `Record ${yiEn(S.maxSessionTokens)} in one session`, fmt: yi, fmtEn: yiEn },
@@ -309,11 +315,14 @@ const A = [
   { g: '微操', icon: '🏗️', name: '包工头', nameEn: 'The Foreman', tier: '金', desc: '派出 100 个子代理，精通自己不干活的艺术', descEn: '100 subagents dispatched; the art of not doing the work yourself', cur: S.taskCalls, max: 100, val: `已派 ${S.taskCalls} 个分身`, valEn: `${S.taskCalls} clones dispatched` },
   { g: '微操', icon: '🧨', name: '一句话工程', nameEn: 'One-Prompt Wonder', tier: '金', desc: '一条指令，AI 连打 50 个工具调用不带喘', descEn: 'One instruction, 50+ tool calls without catching a breath', cur: S.maxBurst, max: 50, val: `最长连击 ${S.maxBurst}`, valEn: `Longest combo ${S.maxBurst}` },
   { g: '微操', icon: '🫡', name: '你说得对学派', nameEn: '"You\'re Absolutely Right"', tier: '银', desc: '被 AI 说过 50 次"你说得对"，而你确实说得对', descEn: 'Heard it 50 times. And you absolutely were', cur: S.saidRight, max: 50, val: `${S.saidRight} 次`, valEn: `${S.saidRight} times` },
+  { g: '微操', icon: '❓', name: '灵魂拷问', nameEn: 'The Lone "?"', tier: '银', desc: '单发一个"？"，共 5 次。一个字都懒得多打，出了什么事它自己心里有数', descEn: 'Sent a lone "?" 5 times. One character; it knows what it did', cur: S.loneQ, max: 5, val: `${S.loneQ} 记灵魂拷问`, valEn: `${S.loneQ} lone question marks` },
   { g: '微操', icon: '🛑', name: '刹车侠', nameEn: 'Emergency Brake', tier: '银', desc: '按 20 次 Esc 打断输出。刹车是最后的尊严', descEn: '20 Esc presses; the brake is your last dignity', cur: S.interrupts, max: 20, val: `踩了 ${S.interrupts} 脚刹车`, valEn: `${S.interrupts} brakes` },
   { g: '微操', icon: '🚢', name: 'Ship 机器', nameEn: 'Ship Machine', tier: '金', desc: '经手 100 个 commit，信息还都写得比你好', descEn: '100 commits, with messages written better than yours', cur: S.gitCommits, max: 100, val: `${S.gitCommits} 个 commit`, valEn: `${S.gitCommits} commits` },
   { g: '微操', icon: '💥', name: '上下文爆破手', nameEn: 'Context Bomber', tier: '银', desc: '把对话聊到失忆 10 次，compact 是一种境界', descEn: 'Talked the AI into amnesia 10 times; compaction is a lifestyle', cur: S.compacts, max: 10, val: `${S.compacts} 次失忆`, valEn: `${S.compacts} blackouts` },
+  { g: '微操', icon: '🧹', name: '重开侠', nameEn: 'Clean Slate', tier: '银', desc: '/clear 了 20 次。聊崩的对话不用修，重开就好，你不欠历史一个解释', descEn: 'Hit /clear 20 times. A broken chat is not fixed, it is reborn', cur: S.clears, max: 20, val: `${S.clears} 次从头再来`, valEn: `${S.clears} fresh starts` },
   { g: '微操', icon: '🎰', name: '全家桶收集者', nameEn: 'Model Collector', tier: '银', desc: '用过 3 种以上模型：有的干活，有的跑腿，有的背锅', descEn: '3+ models: one works, one runs errands, one takes the blame', cur: S.models.size, max: 3, val: `${S.models.size} 种模型`, valEn: `${S.models.size} models` },
-  { g: '微操', icon: '🙋', name: '甲方本人', nameEn: 'The Client', tier: '铜', desc: '被 AI 反过来追问 20 次需求，这就是话语权', descEn: 'The AI asked YOU for requirements 20 times; that is leverage', cur: S.askCalls, max: 20, val: `被追问 ${S.askCalls} 次`, valEn: `Asked ${S.askCalls} times` },
+  { g: '微操', icon: '🙋', name: '甲方本人', nameEn: 'The Client', tier: '铜', desc: '被 AI 反过来追问 20 次需求。谁写 PRD？不存在的，它猜不动了自然会问', descEn: 'The AI asked YOU to clarify 20 times. PRD? It asks when guessing fails', cur: S.askCalls, max: 20, val: `被追问 ${S.askCalls} 次`, valEn: `Asked ${S.askCalls} times` },
+  { g: '微操', icon: '🙇', name: '我错了', nameEn: 'My Bad', tier: '铜', desc: '对 AI 说过 5 次对不起。它不需要道歉，但你需要这个仪式', descEn: "Apologized to the AI 5 times. It doesn't need it; you need the closure", cur: S.sorrys, max: 5, val: `${S.sorrys} 次道歉`, valEn: `${S.sorrys} apologies` },
   { g: '微操', icon: '🙏', name: '人机礼仪模范', nameEn: 'Politeness Award', tier: '铜', desc: '对 AI 说了 20 次谢谢。它记不住，但你是好人', descEn: 'Said thanks 20 times. It will not remember, but you are a good person', cur: S.thanks, max: 20, val: `${S.thanks} 次感谢`, valEn: `${S.thanks} thanks` },
   { g: '微操', icon: '🤬', name: '口吐芬芳', nameEn: 'Potty Mouth', tier: '金', hidden: true, desc: '对 AI 爆了 10 次粗口。致敬 2012 年 Visual Studio 成就系统的 Potty Mouth', descEn: 'Swore at the AI 10 times. A tribute to Visual Studio Achievements (2012)', cur: S.swears, max: 10, val: `${S.swears} 次真情流露`, valEn: `${S.swears} heartfelt outbursts` },
   { g: '微操', icon: '⏳', name: '已读不回', nameEn: 'Left on Read', tier: '金', hidden: true, desc: 'AI 答完干等你 2 小时起步，共 5 次。它不困，你先睡', descEn: 'The AI answered, you vanished for 2+ hours, 5 times. It is not tired; you sleep first', cur: S.waits, max: 5, val: `共 ${S.waits} 次，最长晾了 ${S.maxWait >= 48 * 36e5 ? (S.maxWait / 864e5).toFixed(1) + ' 天' : (S.maxWait / 36e5).toFixed(1) + ' 小时'}`, valEn: `${S.waits} times · longest ghost ${S.maxWait >= 48 * 36e5 ? (S.maxWait / 864e5).toFixed(1) + ' days' : (S.maxWait / 36e5).toFixed(1) + 'h'}` },
